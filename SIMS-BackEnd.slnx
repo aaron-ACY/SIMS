@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="SIMS-BackEnd/SIMS-API.csproj" />
+  <Project Path="SIMS.Application/SIMS.Application.csproj" />
+  <Project Path="SIMS.Domain/SIMS.Domain.csproj" />
+  <Project Path="SIMS.Infrastructure/SIMS.Infrastructure.csproj" />
+  <Project Path="SIMS.Shared/SIMS.Shared.csproj" />
+</Solution>

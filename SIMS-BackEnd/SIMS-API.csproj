@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SIMS_BackEnd</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SIMS.Application\SIMS.Application.csproj" />
+    <ProjectReference Include="..\SIMS.Infrastructure\SIMS.Infrastructure.csproj" />
+    <ProjectReference Include="..\SIMS.Shared\SIMS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copy CSV seed files to output directory so they are accessible at runtime -->
+    <Content Include="Data\**\*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

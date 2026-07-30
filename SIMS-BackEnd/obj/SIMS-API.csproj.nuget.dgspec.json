@@ -1,0 +1,427 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS-BackEnd\\SIMS-API.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS-BackEnd\\SIMS-API.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS-BackEnd\\SIMS-API.csproj",
+        "projectName": "SIMS-API",
+        "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS-BackEnd\\SIMS-API.csproj",
+        "packagesPath": "C:\\Users\\huudan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS-BackEnd\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\huudan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "framework": "net8.0",
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj"
+              },
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Infrastructure\\SIMS.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Infrastructure\\SIMS.Infrastructure.csproj"
+              },
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "framework": "net8.0",
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.19, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj",
+        "projectName": "SIMS.Application",
+        "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj",
+        "packagesPath": "C:\\Users\\huudan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\huudan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "framework": "net8.0",
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj"
+              },
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "framework": "net8.0",
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "FluentValidation.DependencyInjectionExtensions": {
+              "target": "Package",
+              "version": "[11.11.0, )"
+            },
+            "Mapster": {
+              "target": "Package",
+              "version": "[7.4.0, )"
+            },
+            "Mapster.DependencyInjection": {
+              "target": "Package",
+              "version": "[1.0.0, )"
+            },
+            "Microsoft.Extensions.Options": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj",
+        "projectName": "SIMS.Domain",
+        "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj",
+        "packagesPath": "C:\\Users\\huudan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\huudan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "framework": "net8.0",
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "framework": "net8.0",
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Infrastructure\\SIMS.Infrastructure.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Infrastructure\\SIMS.Infrastructure.csproj",
+        "projectName": "SIMS.Infrastructure",
+        "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Infrastructure\\SIMS.Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\huudan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Infrastructure\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\huudan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "framework": "net8.0",
+            "targetAlias": "net8.0",
+            "projectReferences": {
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Application\\SIMS.Application.csproj"
+              },
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Domain\\SIMS.Domain.csproj"
+              },
+              "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj": {
+                "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "framework": "net8.0",
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "CsvHelper": {
+              "target": "Package",
+              "version": "[33.1.0, )"
+            },
+            "Microsoft.Extensions.Configuration.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.Extensions.DependencyInjection.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.Extensions.Options": {
+              "target": "Package",
+              "version": "[8.0.2, )"
+            },
+            "Microsoft.Extensions.Options.ConfigurationExtensions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.12.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj",
+        "projectName": "SIMS.Shared",
+        "projectPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\SIMS.Shared.csproj",
+        "packagesPath": "C:\\Users\\huudan\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\huudan\\source\\repos\\SIMS-BackEnd\\SIMS.Shared\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\huudan\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "framework": "net8.0",
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "10.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "framework": "net8.0",
+          "targetAlias": "net8.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

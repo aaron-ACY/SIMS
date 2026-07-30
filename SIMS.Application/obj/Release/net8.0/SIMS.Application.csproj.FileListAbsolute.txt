@@ -1,0 +1,17 @@
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Application.deps.json
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Application.dll
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Application.pdb
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Domain.dll
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Shared.dll
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Domain.pdb
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\bin\Release\net8.0\SIMS.Shared.pdb
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.csproj.AssemblyReference.cache
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.AssemblyInfoInputs.cache
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.AssemblyInfo.cs
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.csproj.CoreCompileInputs.cache
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.App.769717F6.Up2Date
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.dll
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\refint\SIMS.Application.dll
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\SIMS.Application.pdb
+C:\Users\huudan\source\repos\SIMS-BackEnd\SIMS.Application\obj\Release\net8.0\ref\SIMS.Application.dll

@@ -1,0 +1,4 @@
+Id,Username,Email,PasswordHash,Salt,FirstName,LastName,RoleId,IsActive,CreatedAt,UpdatedAt
+1,admin,admin.updated@sims.edu,Pzxucb7pEKHHEE8+lPfhBn6VQCqF7J5OSetIRwDqJ34=,u42JjYeCBDSz8wXavgbRCw==,System,Administrator,1,True,2026-01-01T00:00:00.0000000Z,2026-07-27T10:02:07.0771766Z
+2,instructor,instructor@sims.edu,EnWB0Q0FqSBSOvoVd8ZRdr9WBhwsRWvdBgCUyL2NmOI=,9Ij+QZIz5W+OOIiN6s3U3A==,Jane,Smith,2,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+3,student,student@sims.edu,wOk0patYrjuPphoi6NoFKM1en/uzIZCSOPzCSqkvtEI=,kepeickwh9RJje9XxqDNzQ==,John,Doe,3,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z

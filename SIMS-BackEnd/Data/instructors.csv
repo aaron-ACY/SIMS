@@ -1,0 +1,2 @@
+Id, UserId, InstructorCode, Department            , Degree, Specialization      , HireDate                    , Phone     , IsActive, CreatedAt                   , UpdatedAt
+ 1,      5, GV001         , Information Technology, Master, Software Engineering, 2024-08-01T00:00:00.0000000Z, 0901234567, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z

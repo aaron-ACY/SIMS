@@ -1,0 +1,2 @@
+Id, UserId, StudentCode, DateOfBirth                 , Gender, Phone     , Address             , Major                 , EnrollmentYear, Status, IsActive, CreatedAt                   , UpdatedAt
+ 1,      4, SV001      , 2005-03-15T00:00:00.0000000Z, Female, 0912345678, 123 Le Loi - Da Nang, Information Technology,           2023, Active, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
