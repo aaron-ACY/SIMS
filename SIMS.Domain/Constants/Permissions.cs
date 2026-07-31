@@ -34,9 +34,11 @@ public static class Permissions
     public const string DeleteSubject = "DELETE_SUB";
 
     // ── Classes ───────────────────────────────────────────────────────── //
-    public const string CreateClass = "CREATE_CLASS";
-    public const string Enrollments = "ENROLLMENTS";
-    public const string GetOut      = "GETOUT";
+    public const string ViewClasses           = "VIEW_CLA";
+    public const string ListStudentsInClass   = "LIST_STU";
+    public const string CreateClass           = "CREATE_CLASS";
+    public const string Enrollments           = "ENROLLMENTS";
+    public const string GetOut                = "GETOUT";
 
     // ── Grades ────────────────────────────────────────────────────────── //
     public const string CreateGrade = "CREATE_GRADE";
@@ -80,6 +82,8 @@ public static class Permissions
         ViewSubject,
         CreateSubject,
         DeleteSubject,
+        ViewClasses,
+        ListStudentsInClass,
         CreateClass,
         Enrollments,
         GetOut,
