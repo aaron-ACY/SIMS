@@ -1,2 +1,6 @@
 Id, UserId, InstructorCode, Department            , Degree, Specialization      , HireDate                    , Phone     , IsActive, CreatedAt                   , UpdatedAt
- 1,      5, GV001         , Information Technology, Master, Software Engineering, 2024-08-01T00:00:00.0000000Z, 0901234567, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+ 1,      3, GV00001       , Information Technology, Master, Software Engineering, 2024-08-01T00:00:00.0000000Z, 0901234567, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+ 2,      4, GV00002       , Computer Science      , PhD   , Artificial Intelligence, 2023-09-01T00:00:00.0000000Z, 0902345678, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 3,      5, GV00003       , Business Administration, Master, Finance Management  , 2022-06-15T00:00:00.0000000Z, 0903456789, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 4,      6, GV00004       , Information Technology, Master, Network Security    , 2023-03-01T00:00:00.0000000Z, 0904567890, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 5,      7, GV00005       , Information Technology, PhD   , Data Science        , 2021-08-20T00:00:00.0000000Z, 0905678901, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z

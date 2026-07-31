@@ -21,6 +21,35 @@ public class ClassesController : ControllerBase
     }
 
     /// <summary>
+    /// Returns all classes. Requires the VIEW_CLA permission.
+    /// </summary>
+    [HttpGet]
+    [Authorize(Policy = Permissions.ViewClasses)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<ClassListItemResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetClasses()
+    {
+        var classes = await _classService.GetClassesAsync();
+        return Ok(ApiResponse<IEnumerable<ClassListItemResponse>>.Ok(classes));
+    }
+
+    /// <summary>
+    /// Returns class info with enrolled students. Requires the LIST_STU permission.
+    /// </summary>
+    [HttpGet("{classId:int}/enrollments")]
+    [Authorize(Policy = Permissions.ListStudentsInClass)]
+    [ProducesResponseType(typeof(ApiResponse<ClassEnrollmentsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetStudentsInClass(int classId)
+    {
+        var response = await _classService.GetStudentsInClassAsync(classId);
+        return Ok(ApiResponse<ClassEnrollmentsResponse>.Ok(response));
+    }
+
+    /// <summary>
     /// Creates a new class. Requires the CREATE_CLASS permission.
     /// </summary>
     [HttpPost]

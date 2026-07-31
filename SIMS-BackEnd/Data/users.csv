@@ -1,4 +1,18 @@
-Id, Username   , Email           , PasswordHash                                , Salt                    , FirstName, LastName, RoleId, IsActive, CreatedAt                   , UpdatedAt
- 1, admin      , admin@sims.edu  , PJKrmJPzCdJRTXTDdYSrISEM02CTv4XykdB69VslBdA=, 5U0Y1K2aXeajq1SSvalIEw==, System   , Admin   ,      1, True    , 2026-07-29T09:30:49.7917929Z, 2026-07-29T09:30:49.7917929Z
- 2, tranngoczit, user@example.com, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Ngoc     , Zit     ,      3, True    , 2026-07-29T09:30:49.7917929Z, 2026-07-29T09:30:49.7917929Z
- 3, okuzchan   , okuz@example.com, RnunkGNseYEcUv8DnRJphbbSSTAeNmIn3xny4iYM/dM=, OkOKOZ3vodJmSqzvJVw0Fg==, david    , vu      ,      2, True    , 2026-07-29T09:30:49.7917929Z, 2026-07-29T09:30:49.7917929Z
+Id, Username   , Email              , PasswordHash                                , Salt                    , FirstName, LastName, RoleId, IsActive, CreatedAt                   , UpdatedAt
+ 1, admin      , admin@sims.edu     , PJKrmJPzCdJRTXTDdYSrISEM02CTv4XykdB69VslBdA=, 5U0Y1K2aXeajq1SSvalIEw==, System   , Admin   ,      1, True    , 2026-07-29T09:30:49.7917929Z, 2026-07-29T09:30:49.7917929Z
+ 2, tranngoczit, user@example.com   , pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Ngoc     , Zit     ,      3, True    , 2026-07-29T09:30:49.7917929Z, 2026-07-29T09:30:49.7917929Z
+ 3, okuzchan   , okuz@example.com   , RnunkGNseYEcUv8DnRJphbbSSTAeNmIn3xny4iYM/dM=, OkOKOZ3vodJmSqzvJVw0Fg==, david    , vu      ,      2, True    , 2026-07-29T09:30:49.7917929Z, 2026-07-29T09:30:49.7917929Z
+ 4, nguyenvana , nguyenvana@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Van A    , Nguyen  ,      2, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 5, tranthib   , tranthib@sims.edu  , pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Thi B    , Tran    ,      2, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 6, levanc     , levanc@sims.edu    , pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Van C    , Le      ,      2, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 7, phamthid   , phamthid@sims.edu  , pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Thi D    , Pham    ,      2, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 8, student001 , student001@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, An       , Nguyen  ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 9, student002 , student002@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Binh     , Tran    ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+10, student003 , student003@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Cuong    , Le      ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+11, student004 , student004@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Dung     , Pham    ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+12, student005 , student005@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Em       , Hoang   ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+13, student006 , student006@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Phong    , Vo      ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+14, student007 , student007@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Giang    , Dang    ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+15, student008 , student008@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Hoa      , Bui     ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+16, student009 , student009@sims.edu, pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=, y7EVVwmLsZmPcmofQ/9cdQ==, Linh     , Cao     ,      3, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+17, trieuhoang , trieu@example.com  , bizy5lA40UlPiHjb8XZz6H6T8d/Dnkyql9vub35r2/E=, 1geLEW6pSZ1u62wElOEV2g==, dinh     , trieu   ,      3, True    , 2026-07-31T05:28:49.1133029Z, 2026-07-31T05:28:49.1133033Z

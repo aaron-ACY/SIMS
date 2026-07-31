@@ -1,1 +1,5 @@
-Id,ClassId,StudentId,EnrolledAt,IsActive
+Id, ClassId, StudentId, EnrolledAt                  , IsActive
+ 1,       1,         1, 2026-09-01T00:00:00.0000000Z, True
+ 2,       3,         1, 2026-09-01T00:00:00.0000000Z, True
+ 3,       4,         1, 2027-02-01T00:00:00.0000000Z, True
+ 4,       5,         1, 2027-02-01T00:00:00.0000000Z, True

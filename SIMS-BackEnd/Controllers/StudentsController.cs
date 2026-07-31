@@ -54,8 +54,8 @@ public class StudentsController : ControllerBase
     public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest request)
     {
         var student = await _studentService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetStudent), new { id = student.Id },
-            ApiResponse<StudentResponse>.Ok(student));
+        return StatusCode(StatusCodes.Status201Created,
+            ApiResponse<StudentResponse>.Ok(student, "Student created successfully."));
     }
 
     /// <summary>

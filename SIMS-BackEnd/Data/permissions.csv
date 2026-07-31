@@ -25,3 +25,5 @@ Id, Name             , Description
 24, EDIT_PROFILE     , Edit personal profile
 25, CREATE_STUDENT   , Create new student records
 26, DELETE_STUDENT   , Delete student records
+27, VIEW_CLA         , View class list
+28, LIST_STU         , View students enrolled in a class

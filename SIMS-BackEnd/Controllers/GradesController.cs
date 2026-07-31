@@ -57,18 +57,18 @@ public class GradesController : ControllerBase
     }
 
     /// <summary>
-    /// Returns all grades for the student linked to the given user account.
-    /// The target user must have the Student role. Requires the VIEW_SCORE permission.
+    /// Returns the aggregated grade report for the student with the given student code.
+    /// Requires the VIEW_SCORE permission.
     /// </summary>
-    [HttpGet("student/{userId:int}")]
+    [HttpGet("student/{studentCode}")]
     [Authorize(Policy = Permissions.ViewScore)]
-    [ProducesResponseType(typeof(ApiResponse<IEnumerable<GradeResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<StudentGradeReportResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStudentScores(int userId)
+    public async Task<IActionResult> GetStudentScores(string studentCode)
     {
-        var grades = await _gradeService.GetScoresByUserIdAsync(userId);
-        return Ok(ApiResponse<IEnumerable<GradeResponse>>.Ok(grades, "Scores retrieved successfully."));
+        var report = await _gradeService.GetScoresByStudentCodeAsync(studentCode);
+        return Ok(ApiResponse<StudentGradeReportResponse>.Ok(report));
     }
 }

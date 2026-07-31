@@ -1,2 +1,11 @@
 Id, UserId, StudentCode, DateOfBirth                 , Gender, Phone     , Address             , Major                 , EnrollmentYear, Status, IsActive, CreatedAt                   , UpdatedAt
- 1,      4, SV001      , 2005-03-15T00:00:00.0000000Z, Female, 0912345678, 123 Le Loi - Da Nang, Information Technology,           2023, Active, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+ 1,      2, BD00001    , 2005-03-15T00:00:00.0000000Z, Female, 0912345678, 123 Le Loi - Da Nang, Information Technology,           2023, Active, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+ 2,      8, BD00002    , 2004-05-20T00:00:00.0000000Z, Male  , 0913456789, 456 Tran Phu - Ha Noi, Computer Science      ,           2022, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 3,      9, BD00003    , 2005-08-10T00:00:00.0000000Z, Male  , 0914567890, 789 Nguyen Trai - HCM, Information Technology,           2023, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 4,     10, BD00004    , 2004-11-25T00:00:00.0000000Z, Female, 0915678901, 321 Le Duan - Da Nang, Business Administration,           2022, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 5,     11, BD00005    , 2005-02-14T00:00:00.0000000Z, Male  , 0916789012, 654 Vo Van Tan - HCM , Computer Science      ,           2023, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 6,     12, BD00006    , 2004-07-30T00:00:00.0000000Z, Female, 0917890123, 987 Ba Trieu - Ha Noi, Information Technology,           2022, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 7,     13, BD00007    , 2005-01-18T00:00:00.0000000Z, Male  , 0918901234, 147 Hai Ba Trung-HCM , Business Administration,           2023, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 8,     14, BD00008    , 2004-09-05T00:00:00.0000000Z, Female, 0919012345, 258 Ly Thuong Kiet-HN, Computer Science      ,           2022, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+ 9,     15, BD00009    , 2005-04-22T00:00:00.0000000Z, Male  , 0920123456, 369 Phan Dinh Phung-DN, Information Technology,           2023, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
+10,     16, BD00010    , 2004-12-08T00:00:00.0000000Z, Female, 0921234567, 741 Quang Trung - HCM, Business Administration,           2022, Active, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
