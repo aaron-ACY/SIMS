@@ -11,8 +11,9 @@ public interface IGradeService
     Task<GradeResponse> UpdateAsync(int gradeId, UpdateGradeRequest request);
 
     /// <summary>
-    /// Returns all grades for the student linked to <paramref name="userId"/>.
-    /// Throws when the user does not exist or the account is not a student. Requires VIEW_SCORE.
+    /// Returns the aggregated grade report for the student identified by
+    /// <paramref name="studentCode"/>. Throws when the student does not exist.
+    /// Requires VIEW_SCORE.
     /// </summary>
-    Task<IEnumerable<GradeResponse>> GetScoresByUserIdAsync(int userId);
+    Task<StudentGradeReportResponse> GetScoresByStudentCodeAsync(string studentCode);
 }

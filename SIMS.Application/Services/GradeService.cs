@@ -1,7 +1,6 @@
 using SIMS.Application.DTOs.Grades;
 using SIMS.Application.Interfaces.Repositories;
 using SIMS.Application.Interfaces.Services;
-using SIMS.Domain.Constants;
 using SIMS.Domain.Entities;
 using SIMS.Shared.Exceptions;
 
@@ -13,28 +12,28 @@ public class GradeService : IGradeService
     private readonly IEnrollmentRepository _enrollmentRepository;
     private readonly IStudentRepository    _studentRepository;
     private readonly IClassRepository      _classRepository;
+    private readonly ISubjectRepository    _subjectRepository;
     private readonly IUserRepository       _userRepository;
-    private readonly IRoleRepository       _roleRepository;
 
     public GradeService(
         IGradeRepository      gradeRepository,
         IEnrollmentRepository enrollmentRepository,
         IStudentRepository    studentRepository,
         IClassRepository      classRepository,
-        IUserRepository       userRepository,
-        IRoleRepository       roleRepository)
+        ISubjectRepository    subjectRepository,
+        IUserRepository       userRepository)
     {
         _gradeRepository      = gradeRepository;
         _enrollmentRepository = enrollmentRepository;
         _studentRepository    = studentRepository;
         _classRepository      = classRepository;
+        _subjectRepository    = subjectRepository;
         _userRepository       = userRepository;
-        _roleRepository       = roleRepository;
     }
 
     public async Task<GradeResponse> CreateAsync(CreateGradeRequest request)
     {
-        // Verify the enrollment exists and is active.
+        // Verify the enrollment exists.
         var enrollment = await _enrollmentRepository.GetByIdAsync(request.EnrollmentId)
                          ?? throw new AppException(ErrorCode.ENROLLMENT_NOT_EXISTED);
 
@@ -72,28 +71,56 @@ public class GradeService : IGradeService
         return await BuildResponseAsync(grade);
     }
 
-    public async Task<IEnumerable<GradeResponse>> GetScoresByUserIdAsync(int userId)
+    public async Task<StudentGradeReportResponse> GetScoresByStudentCodeAsync(string studentCode)
     {
-        // Verify the user exists.
-        var user = await _userRepository.GetByIdAsync(userId)
-                   ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
-
-        // The endpoint is only valid for student accounts.
-        var role = await _roleRepository.GetByIdAsync(user.RoleId);
-        if (role?.Name != Roles.Student)
-            throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
-
-        // Resolve the student record linked to this user account.
-        var student = await _studentRepository.GetByUserIdAsync(userId)
+        var student = await _studentRepository.GetByStudentCodeAsync(studentCode)
                       ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
 
-        var grades = await _gradeRepository.GetByStudentIdAsync(student.Id);
+        var user = await _userRepository.GetByIdAsync(student.UserId);
 
-        var responses = new List<GradeResponse>();
+        var grades = (await _gradeRepository.GetByStudentIdAsync(student.Id))
+                     .OrderByDescending(g => g.GradedAt)
+                     .ToList();
+
+        // Top-level class/semester: taken from the most-recent grade's class.
+        string classCode   = string.Empty;
+        int    semester    = 0;
+        bool   topLevelSet = false;
+
+        var gradeItems = new List<GradeItemResponse>();
+
         foreach (var grade in grades)
-            responses.Add(await BuildResponseAsync(grade));
+        {
+            var schoolClass = await _classRepository.GetByIdAsync(grade.ClassId);
+            var subject     = schoolClass is not null
+                              ? await _subjectRepository.GetByIdAsync(schoolClass.SubjectId)
+                              : null;
 
-        return responses;
+            if (!topLevelSet && schoolClass is not null)
+            {
+                classCode   = schoolClass.ClassCode;
+                semester    = schoolClass.Semester;
+                topLevelSet = true;
+            }
+
+            gradeItems.Add(new GradeItemResponse
+            {
+                SubjectCode = subject?.SubjectCode ?? string.Empty,
+                SubjectName = subject?.Name        ?? string.Empty,
+                Scores      = grade.Score,
+                Rating      = grade.Classification
+            });
+        }
+
+        return new StudentGradeReportResponse
+        {
+            StudentCode = student.StudentCode,
+            FirstName   = user?.FirstName ?? string.Empty,
+            LastName    = user?.LastName  ?? string.Empty,
+            Class       = classCode,
+            Semester    = semester,
+            Grades      = gradeItems
+        };
     }
 
     // ------------------------------------------------------------------ //
@@ -104,15 +131,15 @@ public class GradeService : IGradeService
     /// </summary>
     public static string Classify(double score) => score switch
     {
-        >= 9.0              => "Distinction",
-        >= 8.0              => "Merit",
-        >= 6.5              => "Pass",
-        _                   => "Refer"
+        >= 9.0 => "Distinction",
+        >= 8.0 => "Merit",
+        >= 6.5 => "Pass",
+        _      => "Refer"
     };
 
     private async Task<GradeResponse> BuildResponseAsync(Grade grade)
     {
-        var student    = await _studentRepository.GetByIdAsync(grade.StudentId);
+        var student     = await _studentRepository.GetByIdAsync(grade.StudentId);
         var schoolClass = await _classRepository.GetByIdAsync(grade.ClassId);
 
         // Resolve student's display name via their linked user account.

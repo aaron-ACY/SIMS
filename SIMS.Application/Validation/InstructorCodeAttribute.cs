@@ -4,18 +4,18 @@ using System.Text.RegularExpressions;
 namespace SIMS.Application.Validation;
 
 /// <summary>
-/// Validates student code format: "BD" prefix followed by exactly 5 digits (e.g., BD00519).
+/// Validates instructor code format: "GV" prefix followed by exactly 5 digits (e.g., GV00123).
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
-public partial class StudentCodeAttribute : ValidationAttribute
+public partial class InstructorCodeAttribute : ValidationAttribute
 {
-    private const string Pattern = @"^BD\d{5}$";
+    private const string Pattern = @"^GV\d{5}$";
 
     [GeneratedRegex(Pattern, RegexOptions.IgnoreCase)]
-    private static partial Regex StudentCodeRegex();
+    private static partial Regex InstructorCodeRegex();
 
-    public StudentCodeAttribute()
-        : base("Student code must start with 'BD' followed by exactly 5 digits (e.g., BD00519).")
+    public InstructorCodeAttribute()
+        : base("Instructor code must start with 'GV' followed by exactly 5 digits (e.g., GV00123).")
     {
     }
 
@@ -26,7 +26,7 @@ public partial class StudentCodeAttribute : ValidationAttribute
 
         var code = value.ToString()!;
 
-        if (!StudentCodeRegex().IsMatch(code))
+        if (!InstructorCodeRegex().IsMatch(code))
             return new ValidationResult(ErrorMessage);
 
         return ValidationResult.Success;

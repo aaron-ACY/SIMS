@@ -1,5 +1,6 @@
 using SIMS.Application.DTOs.Classes;
 using SIMS.Application.DTOs.Enrollments;
+using SIMS.Application.DTOs.Students;
 using SIMS.Application.Interfaces.Repositories;
 using SIMS.Application.Interfaces.Services;
 using SIMS.Domain.Entities;
@@ -30,6 +31,80 @@ public class ClassService : IClassService
         _userRepository       = userRepository;
         _enrollmentRepository = enrollmentRepository;
         _studentRepository    = studentRepository;
+    }
+
+    public async Task<IEnumerable<ClassListItemResponse>> GetClassesAsync()
+    {
+        var classes     = await _classRepository.GetAllAsync();
+        var subjects    = await _subjectRepository.GetAllAsync();
+        var instructors = await _instructorRepository.GetAllAsync();
+        var users       = await _userRepository.GetAllAsync();
+
+        var subjectMap    = subjects.ToDictionary(s => s.Id, s => s.Name);
+        var instructorMap = instructors.ToDictionary(i => i.Id);
+        var userMap       = users.ToDictionary(u => u.Id, u => u.FullName);
+
+        return classes.Select(c =>
+        {
+            subjectMap.TryGetValue(c.SubjectId, out var subjectName);
+            instructorMap.TryGetValue(c.InstructorId, out var instructor);
+            var instructorName = instructor is not null && userMap.TryGetValue(instructor.UserId, out var n)
+                ? n : string.Empty;
+
+            return new ClassListItemResponse
+            {
+                ClassCode         = c.ClassCode,
+                SubjectName       = subjectName ?? string.Empty,
+                InstructorName    = instructorName,
+                MaxEnrollment     = c.MaxEnrollment,
+                CurrentEnrollment = c.CurrentEnrollment,
+                IsActive          = c.IsActive
+            };
+        });
+    }
+
+    public async Task<ClassEnrollmentsResponse> GetStudentsInClassAsync(int classId)
+    {
+        var schoolClass = await _classRepository.GetByIdAsync(classId)
+                          ?? throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
+
+        var enrollments = await _enrollmentRepository.GetByClassIdAsync(classId);
+        var studentIds  = enrollments.Select(e => e.StudentId).ToHashSet();
+
+        var allStudents = await _studentRepository.GetAllAsync();
+        var studentMap  = allStudents.Where(s => studentIds.Contains(s.Id))
+                                     .ToDictionary(s => s.Id);
+
+        var users   = await _userRepository.GetAllAsync();
+        var userMap = users.ToDictionary(u => u.Id);
+
+        var enrollmentItems = enrollments.Select(e =>
+        {
+            studentMap.TryGetValue(e.StudentId, out var student);
+            userMap.TryGetValue(student?.UserId ?? 0, out var user);
+
+            return new EnrollmentItemResponse
+            {
+                EnrollmentId = e.Id,
+                Student = new EnrollmentStudentInfo
+                {
+                    StudentCode = student?.StudentCode ?? string.Empty,
+                    FullName    = user?.FullName ?? string.Empty,
+                    DateOfBirth = student?.DateOfBirth ?? default,
+                    Gender      = student?.Gender ?? string.Empty
+                },
+                Status     = student?.Status ?? string.Empty,
+                EnrolledAt = e.EnrolledAt
+            };
+        }).ToList();
+
+        return new ClassEnrollmentsResponse
+        {
+            ClassCode     = schoolClass.ClassCode,
+            SchoolYear    = schoolClass.AcademicYear,
+            TotalStudents = enrollmentItems.Count,
+            Enrollments   = enrollmentItems
+        };
     }
 
     public async Task<ClassResponse> CreateAsync(CreateClassRequest request)

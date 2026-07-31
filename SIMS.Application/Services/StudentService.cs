@@ -119,8 +119,6 @@ public class StudentService : IStudentService
 
         return new StudentResponse
         {
-            Id             = student.Id,
-            UserId         = student.UserId,
             StudentCode    = student.StudentCode,
             FullName       = user?.FullName ?? string.Empty,
             Email          = user?.Email    ?? string.Empty,

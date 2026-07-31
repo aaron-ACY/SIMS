@@ -1,6 +1,7 @@
 using SIMS.Application.DTOs.Users;
 using SIMS.Application.Interfaces.Repositories;
 using SIMS.Application.Interfaces.Services;
+using SIMS.Domain.Constants;
 using SIMS.Domain.Entities;
 using SIMS.Shared.Exceptions;
 
@@ -15,17 +16,23 @@ public class UserService : IUserService
     private readonly IRoleRepository _roleRepository;
     private readonly IPermissionRepository _permissionRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IStudentRepository _studentRepository;
+    private readonly IInstructorRepository _instructorRepository;
 
     public UserService(
         IUserRepository userRepository,
         IRoleRepository roleRepository,
         IPermissionRepository permissionRepository,
-        IPasswordHasher passwordHasher)
+        IPasswordHasher passwordHasher,
+        IStudentRepository studentRepository,
+        IInstructorRepository instructorRepository)
     {
         _userRepository = userRepository;
         _roleRepository = roleRepository;
         _permissionRepository = permissionRepository;
         _passwordHasher = passwordHasher;
+        _studentRepository = studentRepository;
+        _instructorRepository = instructorRepository;
     }
 
     public async Task<UserProfileResponse> GetMyProfileAsync(int userId)
@@ -35,8 +42,23 @@ public class UserService : IUserService
 
         var role        = await _roleRepository.GetByIdAsync(user.RoleId);
         var permissions = await _permissionRepository.GetByRoleIdAsync(user.RoleId);
+        var roleName    = role?.Name ?? string.Empty;
 
-        return MapToProfile(user, role?.Name ?? string.Empty, permissions.Select(p => p.Name));
+        string? studentCode    = null;
+        string? instructorCode = null;
+
+        if (roleName == Roles.Student)
+        {
+            var student = await _studentRepository.GetByUserIdAsync(userId);
+            studentCode = student?.StudentCode;
+        }
+        else if (roleName == Roles.Instructor)
+        {
+            var instructor = await _instructorRepository.GetByUserIdAsync(userId);
+            instructorCode = instructor?.InstructorCode;
+        }
+
+        return MapToProfile(user, roleName, permissions.Select(p => p.Name), studentCode, instructorCode);
     }
 
     public async Task<IEnumerable<UserProfileResponse>> GetAllAsync()
@@ -60,7 +82,9 @@ public class UserService : IUserService
         return users.Select(u => MapToProfile(
             u,
             roleMap.TryGetValue(u.RoleId, out var name) ? name : string.Empty,
-            permissionsByRole.TryGetValue(u.RoleId, out var perms) ? perms : []));
+            permissionsByRole.TryGetValue(u.RoleId, out var perms) ? perms : [],
+            studentCode: null,
+            instructorCode: null));
     }
 
     public async Task<UserProfileResponse> CreateAsync(CreateUserRequest request)
@@ -101,7 +125,7 @@ public class UserService : IUserService
         await _userRepository.AddAsync(user);
 
         var permissions = await _permissionRepository.GetByRoleIdAsync(role.Id);
-        return MapToProfile(user, role.Name, permissions.Select(p => p.Name));
+        return MapToProfile(user, role.Name, permissions.Select(p => p.Name), null, null);
     }
 
     public async Task<UserProfileResponse> UpdateMyInfoAsync(int userId, UpdateMyInfoRequest request)
@@ -127,7 +151,7 @@ public class UserService : IUserService
         var role        = await _roleRepository.GetByIdAsync(user.RoleId);
         var permissions = await _permissionRepository.GetByRoleIdAsync(user.RoleId);
 
-        return MapToProfile(user, role?.Name ?? string.Empty, permissions.Select(p => p.Name));
+        return MapToProfile(user, role?.Name ?? string.Empty, permissions.Select(p => p.Name), null, null);
     }
 
     public async Task DeleteAsync(int userId, int currentUserId)
@@ -147,14 +171,17 @@ public class UserService : IUserService
     private static UserProfileResponse MapToProfile(
         Domain.Entities.User user,
         string roleName,
-        IEnumerable<string> permissions) => new()
+        IEnumerable<string> permissions,
+        string? studentCode,
+        string? instructorCode) => new()
     {
-        Id          = user.Id,
-        Username    = user.Username,
-        Email       = user.Email,
-        FirstName   = user.FirstName,
-        LastName    = user.LastName,
-        Role        = roleName,
-        Permissions = permissions.ToList().AsReadOnly()
+        StudentCode    = studentCode,
+        InstructorCode = instructorCode,
+        Username       = user.Username,
+        Email          = user.Email,
+        FirstName      = user.FirstName,
+        LastName       = user.LastName,
+        Role           = roleName,
+        Permissions    = permissions.ToList().AsReadOnly()
     };
 }

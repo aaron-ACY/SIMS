@@ -31,8 +31,6 @@ public class InstructorService : IInstructorService
 
             return new InstructorResponse
             {
-                Id             = i.Id,
-                UserId         = i.UserId,
                 InstructorCode = i.InstructorCode,
                 FullName       = user?.FullName ?? string.Empty,
                 Email          = user?.Email ?? string.Empty,
