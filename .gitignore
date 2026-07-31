@@ -1,0 +1,49 @@
+# ===========================
+# .NET Build Artifacts
+# ===========================
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+
+# ===========================
+# Visual Studio / VS Code
+# ===========================
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+.vscode/
+
+# Rider
+.idea/
+
+# ===========================
+# Claude Code
+# ===========================
+.claude/
+
+# ===========================
+# OS generated files
+# ===========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ===========================
+# Temporary files
+# ===========================
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
