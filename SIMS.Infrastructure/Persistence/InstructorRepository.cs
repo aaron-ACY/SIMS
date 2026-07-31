@@ -19,4 +19,10 @@ public class InstructorRepository : CsvRepositoryBase<Instructor>, IInstructorRe
         var instructors = await ReadAllAsync();
         return instructors.FirstOrDefault(i => i.Id == id);
     }
+
+    public async Task<Instructor?> GetByUserIdAsync(int userId)
+    {
+        var instructors = await ReadAllAsync();
+        return instructors.FirstOrDefault(i => i.UserId == userId);
+    }
 }
