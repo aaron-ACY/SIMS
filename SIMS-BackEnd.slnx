@@ -4,4 +4,5 @@
   <Project Path="SIMS.Domain/SIMS.Domain.csproj" />
   <Project Path="SIMS.Infrastructure/SIMS.Infrastructure.csproj" />
   <Project Path="SIMS.Shared/SIMS.Shared.csproj" />
+  <Project Path="SIMS.Tests/SIMS.Tests.csproj" Id="45d130a3-7ba6-42d9-8b1b-dd31d72c5474" />
 </Solution>
