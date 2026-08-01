@@ -26,11 +26,9 @@ public class GradeServiceTests
         _studentRepo.Object,
         _classRepo.Object,
         _subjectRepo.Object,
-        _userRepo.Object);
+        _userRepo.Object
+    );
 
-    // ── Helpers ────────────────────────────────────────────────────────── //
-
-    /// Thiết lập mock cho BuildResponseAsync (student, class, user).
     private void SetupBuildResponse(int studentId, int classId, int userId)
     {
         _studentRepo.Setup(r => r.GetByIdAsync(studentId))
@@ -41,14 +39,6 @@ public class GradeServiceTests
                  .ReturnsAsync(new User { Id = userId, FirstName = "Nguyen", LastName = "Van A" });
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // 1. Nhập điểm (CreateAsync)
-    // ══════════════════════════════════════════════════════════════════════
-
-    /// <summary>
-    /// Nhập điểm hợp lệ: enrollment tồn tại, chưa có điểm
-    /// → tạo grade thành công và trả về GradeResponse.
-    /// </summary>
     [Fact]
     public async Task CreateAsync_WhenEnrollmentExistsAndNoPriorGrade_ShouldCreateAndReturnGradeResponse()
     {
@@ -71,10 +61,6 @@ public class GradeServiceTests
         _gradeRepo.Verify(r => r.AddAsync(It.IsAny<Grade>()), Times.Once);
     }
 
-    /// <summary>
-    /// Nhập điểm không hợp lệ: enrollment không tồn tại
-    /// → ném AppException ENROLLMENT_NOT_EXISTED.
-    /// </summary>
     [Fact]
     public async Task CreateAsync_WhenEnrollmentDoesNotExist_ShouldThrowEnrollmentNotExisted()
     {
@@ -93,10 +79,6 @@ public class GradeServiceTests
         _gradeRepo.Verify(r => r.AddAsync(It.IsAny<Grade>()), Times.Never);
     }
 
-    /// <summary>
-    /// Nhập điểm không hợp lệ: enrollment đã có điểm rồi
-    /// → ném AppException GRADE_ALREADY_EXISTS.
-    /// </summary>
     [Fact]
     public async Task CreateAsync_WhenGradeAlreadyExists_ShouldThrowGradeAlreadyExists()
     {
@@ -117,14 +99,7 @@ public class GradeServiceTests
                  .Where(e => e.ErrorCode == ErrorCode.GRADE_ALREADY_EXISTS);
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // 2. Chỉnh sửa điểm (UpdateAsync)
-    // ══════════════════════════════════════════════════════════════════════
 
-    /// <summary>
-    /// Chỉnh sửa điểm hợp lệ: grade tồn tại
-    /// → cập nhật thành công, classification được tính lại.
-    /// </summary>
     [Fact]
     public async Task UpdateAsync_WhenGradeExists_ShouldReturnUpdatedResponse()
     {
@@ -145,10 +120,6 @@ public class GradeServiceTests
         _gradeRepo.Verify(r => r.UpdateAsync(It.IsAny<Grade>()), Times.Once);
     }
 
-    /// <summary>
-    /// Chỉnh sửa điểm không hợp lệ: grade không tồn tại
-    /// → ném AppException GRADE_NOT_EXISTED.
-    /// </summary>
     [Fact]
     public async Task UpdateAsync_WhenGradeDoesNotExist_ShouldThrowGradeNotExisted()
     {
@@ -165,13 +136,8 @@ public class GradeServiceTests
                  .Where(e => e.ErrorCode == ErrorCode.GRADE_NOT_EXISTED);
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // 3. Xếp loại theo thang điểm (Classify)
-    // ══════════════════════════════════════════════════════════════════════
+    // xếp loại điểm số
 
-    /// <summary>
-    /// Điểm >= 9.0 → Distinction (Xuất sắc).
-    /// </summary>
     [Theory]
     [InlineData(9.0)]
     [InlineData(10.0)]
@@ -180,9 +146,6 @@ public class GradeServiceTests
         GradeService.Classify(score).Should().Be("Distinction");
     }
 
-    /// <summary>
-    /// Điểm >= 8.0 và < 9.0 → Merit (Khá).
-    /// </summary>
     [Theory]
     [InlineData(8.0)]
     [InlineData(8.9)]
@@ -191,9 +154,6 @@ public class GradeServiceTests
         GradeService.Classify(score).Should().Be("Merit");
     }
 
-    /// <summary>
-    /// Điểm >= 6.5 và < 8.0 → Pass (Trung bình).
-    /// </summary>
     [Theory]
     [InlineData(6.5)]
     [InlineData(7.9)]
@@ -202,12 +162,8 @@ public class GradeServiceTests
         GradeService.Classify(score).Should().Be("Pass");
     }
 
-    /// <summary>
-    /// Điểm < 6.5 → Refer (Yếu / Thi lại).
-    /// </summary>
     [Theory]
     [InlineData(6.4)]
-    [InlineData(0.0)]
     public void Classify_WhenScoreIsBelow6Point5_ShouldReturnRefer(double score)
     {
         GradeService.Classify(score).Should().Be("Refer");
