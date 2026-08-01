@@ -51,6 +51,14 @@ public sealed class ErrorCode
     public static readonly ErrorCode CANNOT_DELETE_SELF =
         new(1014, "You cannot delete your own account", HttpStatusCode.BadRequest);
 
+    public static readonly ErrorCode USER_HAS_ACTIVE_ENROLLMENTS =
+        new(1033, "Cannot delete student — they have active class enrollments",
+            HttpStatusCode.Conflict);
+
+    public static readonly ErrorCode USER_HAS_ACTIVE_CLASSES =
+        new(1034, "Cannot delete instructor — they are assigned to active classes",
+            HttpStatusCode.Conflict);
+
     // ── Course ────────────────────────────────────────────────────────── //
 
     public static readonly ErrorCode COURSE_NOT_EXISTED =
@@ -60,7 +68,10 @@ public sealed class ErrorCode
         new(1016, "Course code existed", HttpStatusCode.BadRequest);
 
     public static readonly ErrorCode INSTRUCTOR_NOT_EXISTED =
-        new(1017, "Instructor not existed", HttpStatusCode.BadRequest);
+        new(1017, "Instructor not existed", HttpStatusCode.NotFound);
+
+    public static readonly ErrorCode INSTRUCTOR_CODE_EXISTED =
+        new(1035, "Instructor code already exists", HttpStatusCode.BadRequest);
 
     // ── Subject ───────────────────────────────────────────────────────── //
 
@@ -132,6 +143,12 @@ public sealed class ErrorCode
     public static readonly ErrorCode REFRESH_WINDOW_EXPIRED =
         new(1021, "Token is too old to refresh — please log in again",
             HttpStatusCode.Unauthorized);
+
+    // ── Rate limiting ─────────────────────────────────────────────────── //
+
+    public static readonly ErrorCode TOO_MANY_REQUESTS =
+        new(1036, "Too many requests — please try again later",
+            HttpStatusCode.TooManyRequests);
 
     // ── Validation ────────────────────────────────────────────────────── //
 
