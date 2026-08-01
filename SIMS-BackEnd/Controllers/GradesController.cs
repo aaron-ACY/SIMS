@@ -30,9 +30,9 @@ public class GradesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateGrade([FromBody] CreateGradeRequest request)
+    public async Task<IActionResult> CreateGrade([FromBody] CreateGradeRequest request, CancellationToken ct)
     {
-        var grade = await _gradeService.CreateAsync(request);
+        var grade = await _gradeService.CreateAsync(request, ct);
 
         return StatusCode(
             StatusCodes.Status201Created,
@@ -50,9 +50,9 @@ public class GradesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> UpdateGrade(int id, [FromBody] UpdateGradeRequest request)
+    public async Task<IActionResult> UpdateGrade(int id, [FromBody] UpdateGradeRequest request, CancellationToken ct)
     {
-        var grade = await _gradeService.UpdateAsync(id, request);
+        var grade = await _gradeService.UpdateAsync(id, request, ct);
         return Ok(ApiResponse<GradeResponse>.Ok(grade, "Grade updated successfully."));
     }
 
@@ -66,9 +66,9 @@ public class GradesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStudentScores(string studentCode)
+    public async Task<IActionResult> GetStudentScores(string studentCode, CancellationToken ct)
     {
-        var report = await _gradeService.GetScoresByStudentCodeAsync(studentCode);
+        var report = await _gradeService.GetScoresByStudentCodeAsync(studentCode, ct);
         return Ok(ApiResponse<StudentGradeReportResponse>.Ok(report));
     }
 }

@@ -28,9 +28,9 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CourseResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetAllCourses()
+    public async Task<IActionResult> GetAllCourses(CancellationToken ct)
     {
-        var courses = await _courseService.GetAllAsync();
+        var courses = await _courseService.GetAllAsync(ct);
         return Ok(ApiResponse<IEnumerable<CourseResponse>>.Ok(courses));
     }
 
@@ -44,9 +44,9 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request)
+    public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest request, CancellationToken ct)
     {
-        var course = await _courseService.CreateAsync(request);
+        var course = await _courseService.CreateAsync(request, ct);
 
         // No GET /api/courses/{id} endpoint exists to serve as the Location target,
         // so a bare 201 is returned instead of a Location header pointing nowhere.
@@ -64,9 +64,9 @@ public class CoursesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteCourse(int id)
+    public async Task<IActionResult> DeleteCourse(int id, CancellationToken ct)
     {
-        await _courseService.DeleteAsync(id);
+        await _courseService.DeleteAsync(id, ct);
         return Ok(ApiResponse.Ok("Course deleted successfully."));
     }
 }

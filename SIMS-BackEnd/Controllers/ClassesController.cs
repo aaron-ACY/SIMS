@@ -28,9 +28,9 @@ public class ClassesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<ClassListItemResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetClasses()
+    public async Task<IActionResult> GetClasses(CancellationToken ct)
     {
-        var classes = await _classService.GetClassesAsync();
+        var classes = await _classService.GetClassesAsync(ct);
         return Ok(ApiResponse<IEnumerable<ClassListItemResponse>>.Ok(classes));
     }
 
@@ -43,9 +43,9 @@ public class ClassesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStudentsInClass(int classId)
+    public async Task<IActionResult> GetStudentsInClass(int classId, CancellationToken ct)
     {
-        var response = await _classService.GetStudentsInClassAsync(classId);
+        var response = await _classService.GetStudentsInClassAsync(classId, ct);
         return Ok(ApiResponse<ClassEnrollmentsResponse>.Ok(response));
     }
 
@@ -59,9 +59,9 @@ public class ClassesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateClass([FromBody] CreateClassRequest request)
+    public async Task<IActionResult> CreateClass([FromBody] CreateClassRequest request, CancellationToken ct)
     {
-        var schoolClass = await _classService.CreateAsync(request);
+        var schoolClass = await _classService.CreateAsync(request, ct);
 
         return StatusCode(
             StatusCodes.Status201Created,
@@ -80,9 +80,9 @@ public class ClassesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> EnrollStudent(
-        int classId, [FromBody] EnrollStudentRequest request)
+        int classId, [FromBody] EnrollStudentRequest request, CancellationToken ct)
     {
-        await _classService.EnrollStudentAsync(classId, request);
+        await _classService.EnrollStudentAsync(classId, request, ct);
         return Ok(ApiResponse.Ok("Student enrolled successfully."));
     }
 
@@ -95,9 +95,9 @@ public class ClassesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RemoveStudent(int classId, int studentId)
+    public async Task<IActionResult> RemoveStudent(int classId, int studentId, CancellationToken ct)
     {
-        await _classService.RemoveStudentAsync(classId, studentId);
+        await _classService.RemoveStudentAsync(classId, studentId, ct);
         return Ok(ApiResponse.Ok("Student removed from class successfully."));
     }
 }

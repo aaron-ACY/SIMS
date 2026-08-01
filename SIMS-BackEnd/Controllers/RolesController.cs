@@ -36,9 +36,10 @@ public class RolesController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> AssignPermissionToRole(
         int roleId,
-        [FromBody] AssignPermissionRequest request)
+        [FromBody] AssignPermissionRequest request,
+        CancellationToken ct)
     {
-        var result = await _permissionService.AssignToRoleAsync(roleId, request);
+        var result = await _permissionService.AssignToRoleAsync(roleId, request, ct);
 
         return Ok(ApiResponse<RolePermissionsResponse>.Ok(
             result, "Permission assigned to role successfully."));

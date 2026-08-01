@@ -28,9 +28,9 @@ public class PermissionsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<PermissionResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetAllPermissions()
+    public async Task<IActionResult> GetAllPermissions(CancellationToken ct)
     {
-        var permissions = await _permissionService.GetAllAsync();
+        var permissions = await _permissionService.GetAllAsync(ct);
         return Ok(ApiResponse<IEnumerable<PermissionResponse>>.Ok(permissions));
     }
 
@@ -45,9 +45,9 @@ public class PermissionsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request)
+    public async Task<IActionResult> CreatePermission([FromBody] CreatePermissionRequest request, CancellationToken ct)
     {
-        var permission = await _permissionService.CreateAsync(request);
+        var permission = await _permissionService.CreateAsync(request, ct);
 
         // No GET /api/permissions/{id} endpoint exists to serve as the Location target,
         // so a bare 201 is returned instead of a Location header pointing nowhere.
@@ -70,9 +70,10 @@ public class PermissionsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> UpdatePermission(
         int id,
-        [FromBody] UpdatePermissionRequest request)
+        [FromBody] UpdatePermissionRequest request,
+        CancellationToken ct)
     {
-        var permission = await _permissionService.UpdateAsync(id, request);
+        var permission = await _permissionService.UpdateAsync(id, request, ct);
 
         return Ok(ApiResponse<PermissionResponse>.Ok(
             permission, "Permission updated successfully."));

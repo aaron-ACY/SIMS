@@ -25,9 +25,9 @@ public class StudentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetAllStudents()
+    public async Task<IActionResult> GetAllStudents(CancellationToken ct)
     {
-        var students = await _studentService.GetAllAsync();
+        var students = await _studentService.GetAllAsync(ct);
         return Ok(ApiResponse<IEnumerable<StudentResponse>>.Ok(students));
     }
 
@@ -36,9 +36,9 @@ public class StudentsController : ControllerBase
     [Authorize(Policy = Permissions.ViewStudents)]
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStudent(int id)
+    public async Task<IActionResult> GetStudent(int id, CancellationToken ct)
     {
-        var student = await _studentService.GetByIdAsync(id);
+        var student = await _studentService.GetByIdAsync(id, ct);
         return Ok(ApiResponse<StudentResponse>.Ok(student));
     }
 
@@ -51,9 +51,9 @@ public class StudentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest request)
+    public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest request, CancellationToken ct)
     {
-        var student = await _studentService.CreateAsync(request);
+        var student = await _studentService.CreateAsync(request, ct);
         return StatusCode(StatusCodes.Status201Created,
             ApiResponse<StudentResponse>.Ok(student, "Student created successfully."));
     }
@@ -67,9 +67,9 @@ public class StudentsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<StudentResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> UpdateStudent(int id, [FromBody] UpdateStudentRequest request)
+    public async Task<IActionResult> UpdateStudent(int id, [FromBody] UpdateStudentRequest request, CancellationToken ct)
     {
-        var student = await _studentService.UpdateAsync(id, request);
+        var student = await _studentService.UpdateAsync(id, request, ct);
         return Ok(ApiResponse<StudentResponse>.Ok(student));
     }
 
@@ -78,9 +78,9 @@ public class StudentsController : ControllerBase
     [Authorize(Policy = Permissions.DeleteStudent)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteStudent(int id)
+    public async Task<IActionResult> DeleteStudent(int id, CancellationToken ct)
     {
-        await _studentService.DeleteAsync(id);
+        await _studentService.DeleteAsync(id, ct);
         return Ok(ApiResponse<object?>.Ok(null));
     }
 }

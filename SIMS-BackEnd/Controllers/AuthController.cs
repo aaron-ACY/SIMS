@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SIMS.Application.DTOs.Auth;
 using SIMS.Application.Interfaces.Services;
 using SIMS.Shared.Exceptions;
@@ -21,11 +22,13 @@ public class AuthController : ControllerBase
 
     /// <summary>Authenticates a user and returns a signed JWT.</summary>
     [HttpPost("login")]
+    [EnableRateLimiting("auth")]
     [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>),       StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [ProducesResponseType(typeof(ApiResponse<object?>),       StatusCodes.Status429TooManyRequests)]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        var result = await _authService.LoginAsync(request);
+        var result = await _authService.LoginAsync(request, ct);
         return Ok(ApiResponse<LoginResponse>.Ok(result));
     }
 
@@ -44,12 +47,14 @@ public class AuthController : ControllerBase
     /// </summary>
     [AllowAnonymous]
     [HttpPost("refresh")]
+    [EnableRateLimiting("auth")]
     [ProducesResponseType(typeof(ApiResponse<LoginResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status429TooManyRequests)]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request, CancellationToken ct)
     {
-        var result = await _authService.RefreshTokenAsync(request);
+        var result = await _authService.RefreshTokenAsync(request, ct);
         return Ok(ApiResponse<LoginResponse>.Ok(result));
     }
 
@@ -59,10 +64,9 @@ public class AuthController : ControllerBase
     /// with the same token will receive 401 Unauthorized.
     ///
     /// Deliberately anonymous (listed in PublicEndpoints.All): a token that has just
-    /// expired should still be revocable. If [Authorize] were present the middleware
-    /// would reject it before the handler ran and the user could not log out cleanly.
-    /// The handler itself extracts and validates the token from the Authorization
-    /// header and returns 401 when it is missing or malformed.
+    /// expired should still be revocable. The handler validates the token's signature,
+    /// issuer and audience while tolerating expiry, then returns 401 when the token
+    /// is missing, malformed, or cannot be verified.
     /// </summary>
     [AllowAnonymous]
     [HttpPost("logout")]
@@ -70,18 +74,14 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Logout()
     {
-        // Extract the raw token from the Authorization header.
         var rawToken = HttpContext.Request.Headers.Authorization
             .ToString()
             .Replace("Bearer ", string.Empty, StringComparison.OrdinalIgnoreCase)
             .Trim();
 
-        // sub claim holds the user ID (claim mapping is disabled — see Program.cs).
-        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        if (!int.TryParse(userIdClaim, out var userId))
-            throw new AppException(ErrorCode.INVALID_TOKEN, "Invalid token claims.");
-
-        await _authService.LogoutAsync(rawToken, userId);
+        // Signature validation + claim extraction happens inside LogoutAsync via
+        // ValidateIgnoringLifetime — no need to parse claims here.
+        await _authService.LogoutAsync(rawToken);
 
         return Ok(ApiResponse.Ok("Logged out successfully."));
     }

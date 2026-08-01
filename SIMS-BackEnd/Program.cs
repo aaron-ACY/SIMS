@@ -1,8 +1,10 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.IdentityModel.Tokens;
 using JsonWebTokenHandler = Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler;
@@ -13,6 +15,7 @@ using SIMS.Infrastructure;
 using SIMS.Infrastructure.Settings;
 using SIMS.Shared.Exceptions;
 using SIMS.Shared.Models;
+using SIMS_BackEnd.Authorization;
 using SIMS_BackEnd.Constants;
 using SIMS_BackEnd.Middleware;
 
@@ -32,6 +35,14 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.Co
 var jwtSettings = builder.Configuration
     .GetSection(JwtSettings.SectionName)
     .Get<JwtSettings>()!;
+
+// Fail fast: secret must be supplied via User Secrets (dev) or Jwt__SecretKey
+// env var (production). Never store it in appsettings.json.
+if (string.IsNullOrWhiteSpace(jwtSettings.SecretKey))
+    throw new InvalidOperationException(
+        "Jwt:SecretKey is not configured. " +
+        "Development: run 'dotnet user-secrets set \"Jwt:SecretKey\" \"<key>\"' in SIMS-BackEnd/. " +
+        "Production: set the Jwt__SecretKey environment variable.");
 
 builder.Services
     .AddAuthentication(options =>
@@ -107,18 +118,42 @@ builder.Services
         };
     });
 
+// ── Rate limiting ─────────────────────────────────────────────────── //
+// "auth" policy: 5 attempts per IP per minute on login/refresh.
+// Uses a fixed window partitioned by remote IP so each client gets its own
+// counter. Queue is set to 0 so excess requests are rejected immediately.
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy("auth", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit          = 5,
+                Window               = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit           = 0   // reject immediately — no queuing
+            }));
+
+    // Return the same ApiResponse envelope as every other error in the app.
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode  = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            ApiResponse.Fail(ErrorCode.TOO_MANY_REQUESTS), cancellationToken);
+    };
+});
+
 // ── Authorization ──────────────────────────────────────────────────── //
-// One policy per permission, named after the permission itself, so an
-// endpoint can declare [Authorize(Policy = Permissions.CreateUser)].
-// A policy succeeds when the JWT carries a matching "permission" claim.
+// PermissionPolicyProvider builds a policy on-demand for any permission
+// string at request time, so permissions created via the API work
+// immediately without a restart.  The foreach over Permissions.All is no
+// longer needed — any [Authorize(Policy = "...")] is handled dynamically.
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+
 builder.Services.AddAuthorization(options =>
 {
-    foreach (var permission in Permissions.All)
-    {
-        options.AddPolicy(permission, policy =>
-            policy.RequireClaim(CustomClaimTypes.Permission, permission));
-    }
-
     // Deny by default: any endpoint that declares no [Authorize] of its own
     // still requires an authenticated caller. Only the routes in
     // PublicEndpoints.All are exempted (see the convention below MapControllers).
@@ -200,6 +235,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRateLimiter();   // before auth so limits apply regardless of token state
 app.UseAuthentication();
 app.UseAuthorization();
 

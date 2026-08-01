@@ -27,9 +27,9 @@ public class SubjectsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<SubjectResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetSubjects()
+    public async Task<IActionResult> GetSubjects(CancellationToken ct)
     {
-        var subjects = await _subjectService.GetAllAsync();
+        var subjects = await _subjectService.GetAllAsync(ct);
         return Ok(ApiResponse<IEnumerable<SubjectResponse>>.Ok(subjects, "Subjects retrieved successfully."));
     }
 
@@ -43,9 +43,9 @@ public class SubjectsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request)
+    public async Task<IActionResult> CreateSubject([FromBody] CreateSubjectRequest request, CancellationToken ct)
     {
-        var subject = await _subjectService.CreateAsync(request);
+        var subject = await _subjectService.CreateAsync(request, ct);
 
         return StatusCode(
             StatusCodes.Status201Created,
@@ -61,9 +61,9 @@ public class SubjectsController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteSubject(int id)
+    public async Task<IActionResult> DeleteSubject(int id, CancellationToken ct)
     {
-        await _subjectService.DeleteAsync(id);
+        await _subjectService.DeleteAsync(id, ct);
         return Ok(ApiResponse.Ok("Subject deleted successfully."));
     }
 }

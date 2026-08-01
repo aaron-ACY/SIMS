@@ -29,9 +29,9 @@ public class UsersController : ControllerBase
     [HttpGet("me")]
     [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetMyProfile()
+    public async Task<IActionResult> GetMyProfile(CancellationToken ct)
     {
-        var profile = await _userService.GetMyProfileAsync(GetCurrentUserId());
+        var profile = await _userService.GetMyProfileAsync(GetCurrentUserId(), ct);
         return Ok(ApiResponse<UserProfileResponse>.Ok(profile));
     }
 
@@ -44,9 +44,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<UserProfileResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers(CancellationToken ct)
     {
-        var users = await _userService.GetAllAsync();
+        var users = await _userService.GetAllAsync(ct);
         return Ok(ApiResponse<IEnumerable<UserProfileResponse>>.Ok(users));
     }
 
@@ -61,9 +61,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request)
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken ct)
     {
-        var profile = await _userService.CreateAsync(request);
+        var profile = await _userService.CreateAsync(request, ct);
 
         // No GET /api/users/{id} endpoint exists to serve as the Location target,
         // so a bare 201 is returned instead of a Location header pointing nowhere.
@@ -83,9 +83,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
-    public async Task<IActionResult> UpdateMyInfo([FromBody] UpdateMyInfoRequest request)
+    public async Task<IActionResult> UpdateMyInfo([FromBody] UpdateMyInfoRequest request, CancellationToken ct)
     {
-        var profile = await _userService.UpdateMyInfoAsync(GetCurrentUserId(), request);
+        var profile = await _userService.UpdateMyInfoAsync(GetCurrentUserId(), request, ct);
 
         return Ok(ApiResponse<UserProfileResponse>.Ok(profile, "Information updated successfully."));
     }
@@ -101,9 +101,9 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteUser(int id)
+    public async Task<IActionResult> DeleteUser(int id, CancellationToken ct)
     {
-        await _userService.DeleteAsync(id, GetCurrentUserId());
+        await _userService.DeleteAsync(id, GetCurrentUserId(), ct);
         return Ok(ApiResponse.Ok("User deleted successfully."));
     }
 
