@@ -9,7 +9,6 @@ public static class Permissions
 {
     // ── Users ─────────────────────────────────────────────────────────── //
     public const string ViewUsers    = "VIEW_USERS";
-    public const string EditInfo     = "EDIT_INFO";
     public const string EditProfile  = "EDIT_PROFILE";
     public const string CreateUser   = "CREATE_USER";
     public const string DeleteUser   = "DELETE_USER";
@@ -21,7 +20,10 @@ public static class Permissions
     public const string DeleteStudent  = "DELETE_STUDENT";
 
     // ── Instructors ───────────────────────────────────────────────────── //
-    public const string ViewInstructors = "VIEW_INSTRUCTORS";
+    public const string ViewInstructors   = "VIEW_INSTRUCTORS";
+    public const string CreateInstructor  = "CREATE_INSTRUCTOR";
+    public const string EditInstructor    = "EDIT_INSTRUCTOR";
+    public const string DeleteInstructor  = "DELETE_INSTRUCTOR";
 
     // ── Courses ───────────────────────────────────────────────────────── //
     public const string ViewCourses  = "VIEW_COURSES";
@@ -64,7 +66,6 @@ public static class Permissions
     public static readonly IReadOnlyList<string> All =
     [
         ViewUsers,
-        EditInfo,
         CreateUser,
         DeleteUser,
         ViewStudents,
@@ -72,6 +73,9 @@ public static class Permissions
         EditStudent,
         DeleteStudent,
         ViewInstructors,
+        CreateInstructor,
+        EditInstructor,
+        DeleteInstructor,
         ViewCourses,
         CreateCourse,
         DeleteCourse,
