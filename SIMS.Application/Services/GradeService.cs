@@ -31,7 +31,7 @@ public class GradeService : IGradeService
         _userRepository       = userRepository;
     }
 
-    public async Task<GradeResponse> CreateAsync(CreateGradeRequest request)
+    public async Task<GradeResponse> CreateAsync(CreateGradeRequest request, CancellationToken ct = default)
     {
         // Verify the enrollment exists.
         var enrollment = await _enrollmentRepository.GetByIdAsync(request.EnrollmentId)
@@ -57,7 +57,7 @@ public class GradeService : IGradeService
         return await BuildResponseAsync(grade);
     }
 
-    public async Task<GradeResponse> UpdateAsync(int gradeId, UpdateGradeRequest request)
+    public async Task<GradeResponse> UpdateAsync(int gradeId, UpdateGradeRequest request, CancellationToken ct = default)
     {
         var grade = await _gradeRepository.GetByIdAsync(gradeId)
                     ?? throw new AppException(ErrorCode.GRADE_NOT_EXISTED);
@@ -71,7 +71,7 @@ public class GradeService : IGradeService
         return await BuildResponseAsync(grade);
     }
 
-    public async Task<StudentGradeReportResponse> GetScoresByStudentCodeAsync(string studentCode)
+    public async Task<StudentGradeReportResponse> GetScoresByStudentCodeAsync(string studentCode, CancellationToken ct = default)
     {
         var student = await _studentRepository.GetByStudentCodeAsync(studentCode)
                       ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
@@ -82,6 +82,14 @@ public class GradeService : IGradeService
                      .OrderByDescending(g => g.GradedAt)
                      .ToList();
 
+        // Load all classes and subjects once, then use dictionary lookup
+        // inside the loop — avoids 2N CSV reads (one per grade) and
+        // replaces them with 2 reads total.
+        var classMap   = (await _classRepository.GetAllAsync())
+                             .ToDictionary(c => c.Id);
+        var subjectMap = (await _subjectRepository.GetAllAsync())
+                             .ToDictionary(s => s.Id);
+
         // Top-level class/semester: taken from the most-recent grade's class.
         string classCode   = string.Empty;
         int    semester    = 0;
@@ -91,10 +99,10 @@ public class GradeService : IGradeService
 
         foreach (var grade in grades)
         {
-            var schoolClass = await _classRepository.GetByIdAsync(grade.ClassId);
-            var subject     = schoolClass is not null
-                              ? await _subjectRepository.GetByIdAsync(schoolClass.SubjectId)
-                              : null;
+            classMap.TryGetValue(grade.ClassId, out var schoolClass);
+            var subject = schoolClass is not null &&
+                          subjectMap.TryGetValue(schoolClass.SubjectId, out var s)
+                          ? s : null;
 
             if (!topLevelSet && schoolClass is not null)
             {

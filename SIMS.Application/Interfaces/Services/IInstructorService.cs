@@ -4,9 +4,21 @@ namespace SIMS.Application.Interfaces.Services;
 
 public interface IInstructorService
 {
+    /// <summary>Returns every instructor with name and email resolved from the linked user.</summary>
+    Task<IEnumerable<InstructorResponse>> GetAllAsync(CancellationToken ct = default);
+
+    /// <summary>Returns a single instructor by internal ID. Throws when not found.</summary>
+    Task<InstructorResponse> GetByIdAsync(int id, CancellationToken ct = default);
+
+    /// <summary>Creates a new instructor record linked to an existing user.</summary>
+    Task<InstructorResponse> CreateAsync(CreateInstructorRequest request, CancellationToken ct = default);
+
+    /// <summary>Applies a partial update to an existing instructor. Throws when not found.</summary>
+    Task<InstructorResponse> UpdateAsync(int id, UpdateInstructorRequest request, CancellationToken ct = default);
+
     /// <summary>
-    /// Returns every instructor with name and email resolved from the linked user.
-    /// Requires the VIEW_INSTRUCTORS permission.
+    /// Deletes the instructor record. Throws when not found or when the instructor
+    /// is still assigned to active classes.
     /// </summary>
-    Task<IEnumerable<InstructorResponse>> GetAllAsync();
+    Task DeleteAsync(int id, CancellationToken ct = default);
 }

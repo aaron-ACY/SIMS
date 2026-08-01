@@ -5,6 +5,7 @@ namespace SIMS.Application.DTOs.Students;
 
 public class UpdateStudentRequest
 {
+    [Required(AllowEmptyStrings = false, ErrorMessage = "Student code is required")]
     [StudentCode]
     public string? StudentCode { get; set; }
 

@@ -19,7 +19,7 @@ public class StudentService : IStudentService
         _userRepository = userRepository;
     }
 
-    public async Task<IEnumerable<StudentResponse>> GetAllAsync()
+    public async Task<IEnumerable<StudentResponse>> GetAllAsync(CancellationToken ct = default)
     {
         var students = await _studentRepository.GetAllAsync();
         var users    = await _userRepository.GetAllAsync();
@@ -28,18 +28,20 @@ public class StudentService : IStudentService
         return students.Select(s => Map(s, userMap));
     }
 
-    public async Task<StudentResponse> GetByIdAsync(int id)
+    public async Task<StudentResponse> GetByIdAsync(int id, CancellationToken ct = default)
     {
         var student = await _studentRepository.GetByIdAsync(id)
                       ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
 
-        var users   = await _userRepository.GetAllAsync();
-        var userMap = users.ToDictionary(u => u.Id);
+        var user    = await _userRepository.GetByIdAsync(student.UserId);
+        var userMap = user is null
+            ? new Dictionary<int, Domain.Entities.User>()
+            : new Dictionary<int, Domain.Entities.User> { [user.Id] = user };
 
         return Map(student, userMap);
     }
 
-    public async Task<StudentResponse> CreateAsync(CreateStudentRequest request)
+    public async Task<StudentResponse> CreateAsync(CreateStudentRequest request, CancellationToken ct = default)
     {
         // Validate linked user exists
         var user = await _userRepository.GetByIdAsync(request.UserId)
@@ -69,7 +71,7 @@ public class StudentService : IStudentService
         return Map(student, new Dictionary<int, Domain.Entities.User> { [user.Id] = user });
     }
 
-    public async Task<StudentResponse> UpdateAsync(int id, UpdateStudentRequest request)
+    public async Task<StudentResponse> UpdateAsync(int id, UpdateStudentRequest request, CancellationToken ct = default)
     {
         var student = await _studentRepository.GetByIdAsync(id)
                       ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
@@ -102,7 +104,7 @@ public class StudentService : IStudentService
         return Map(student, userMap);
     }
 
-    public async Task DeleteAsync(int id)
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
         var deleted = await _studentRepository.DeleteAsync(id);
         if (!deleted)

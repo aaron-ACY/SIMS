@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SIMS.Application.DTOs.Users;
 
 /// <summary>
-/// Payload for PUT /api/users/me. Requires the EDIT_INFO permission.
+/// Payload for PUT /api/users/me. Requires the EDIT_PROFILE permission.
 /// Only fields the caller owns are editable here — role and active state are not.
 /// </summary>
 public class UpdateMyInfoRequest

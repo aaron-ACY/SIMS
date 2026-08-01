@@ -10,20 +10,22 @@ namespace SIMS.Application.Services;
 
 public class ClassService : IClassService
 {
-    private readonly IClassRepository      _classRepository;
-    private readonly ISubjectRepository    _subjectRepository;
-    private readonly IInstructorRepository _instructorRepository;
-    private readonly IUserRepository       _userRepository;
-    private readonly IEnrollmentRepository _enrollmentRepository;
-    private readonly IStudentRepository    _studentRepository;
+    private readonly IClassRepository          _classRepository;
+    private readonly ISubjectRepository        _subjectRepository;
+    private readonly IInstructorRepository     _instructorRepository;
+    private readonly IUserRepository           _userRepository;
+    private readonly IEnrollmentRepository     _enrollmentRepository;
+    private readonly IStudentRepository        _studentRepository;
+    private readonly EnrollmentSemaphoreService _enrollmentLock;
 
     public ClassService(
-        IClassRepository      classRepository,
-        ISubjectRepository    subjectRepository,
-        IInstructorRepository instructorRepository,
-        IUserRepository       userRepository,
-        IEnrollmentRepository enrollmentRepository,
-        IStudentRepository    studentRepository)
+        IClassRepository          classRepository,
+        ISubjectRepository        subjectRepository,
+        IInstructorRepository     instructorRepository,
+        IUserRepository           userRepository,
+        IEnrollmentRepository     enrollmentRepository,
+        IStudentRepository        studentRepository,
+        EnrollmentSemaphoreService enrollmentLock)
     {
         _classRepository      = classRepository;
         _subjectRepository    = subjectRepository;
@@ -31,9 +33,10 @@ public class ClassService : IClassService
         _userRepository       = userRepository;
         _enrollmentRepository = enrollmentRepository;
         _studentRepository    = studentRepository;
+        _enrollmentLock       = enrollmentLock;
     }
 
-    public async Task<IEnumerable<ClassListItemResponse>> GetClassesAsync()
+    public async Task<IEnumerable<ClassListItemResponse>> GetClassesAsync(CancellationToken ct = default)
     {
         var classes     = await _classRepository.GetAllAsync();
         var subjects    = await _subjectRepository.GetAllAsync();
@@ -63,7 +66,7 @@ public class ClassService : IClassService
         });
     }
 
-    public async Task<ClassEnrollmentsResponse> GetStudentsInClassAsync(int classId)
+    public async Task<ClassEnrollmentsResponse> GetStudentsInClassAsync(int classId, CancellationToken ct = default)
     {
         var schoolClass = await _classRepository.GetByIdAsync(classId)
                           ?? throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
@@ -107,7 +110,7 @@ public class ClassService : IClassService
         };
     }
 
-    public async Task<ClassResponse> CreateAsync(CreateClassRequest request)
+    public async Task<ClassResponse> CreateAsync(CreateClassRequest request, CancellationToken ct = default)
     {
         var classCode = request.ClassCode.Trim().ToUpperInvariant();
 
@@ -141,44 +144,71 @@ public class ClassService : IClassService
         return MapToResponse(schoolClass, subject.Name, user?.FullName ?? string.Empty);
     }
 
-    public async Task EnrollStudentAsync(int classId, EnrollStudentRequest request)
+    public async Task EnrollStudentAsync(int classId, EnrollStudentRequest request, CancellationToken ct = default)
     {
-        var schoolClass = await _classRepository.GetByIdAsync(classId)
-                          ?? throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
-
-        if (!schoolClass.IsActive)
-            throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
-
-        if (schoolClass.CurrentEnrollment >= schoolClass.MaxEnrollment)
-            throw new AppException(ErrorCode.CLASS_FULL);
-
-        var student = await _studentRepository.GetByIdAsync(request.StudentId)
-                      ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
-
-        if (await _enrollmentRepository.GetAsync(classId, student.Id) is not null)
-            throw new AppException(ErrorCode.ALREADY_ENROLLED);
-
-        var enrollment = new Enrollment
+        // Acquire a per-class lock so the capacity-check → add-enrollment →
+        // increment-count sequence is atomic with respect to other concurrent
+        // enrolment requests for the same class.
+        var sem = _enrollmentLock.GetSemaphore(classId);
+        await sem.WaitAsync();
+        try
         {
-            ClassId    = classId,
-            StudentId  = student.Id,
-            EnrolledAt = DateTime.UtcNow,
-            IsActive   = true
-        };
+            var schoolClass = await _classRepository.GetByIdAsync(classId)
+                              ?? throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
 
-        await _enrollmentRepository.AddAsync(enrollment);
-        await _classRepository.UpdateEnrollmentCountAsync(classId, +1);
+            if (!schoolClass.IsActive)
+                throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
+
+            if (schoolClass.CurrentEnrollment >= schoolClass.MaxEnrollment)
+                throw new AppException(ErrorCode.CLASS_FULL);
+
+            var student = await _studentRepository.GetByIdAsync(request.StudentId)
+                          ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
+
+            if (await _enrollmentRepository.GetAsync(classId, student.Id) is not null)
+                throw new AppException(ErrorCode.ALREADY_ENROLLED);
+
+            var enrollment = new Enrollment
+            {
+                ClassId    = classId,
+                StudentId  = student.Id,
+                EnrolledAt = DateTime.UtcNow,
+                IsActive   = true
+            };
+
+            await _enrollmentRepository.AddAsync(enrollment);
+
+            // UpdateEnrollmentCountAsync also re-checks capacity inside its own
+            // repository lock (defence-in-depth). Returns false only if the class
+            // disappeared — not expected here since we already hold the lock.
+            await _classRepository.UpdateEnrollmentCountAsync(classId, +1);
+        }
+        finally
+        {
+            sem.Release();
+        }
     }
 
-    public async Task RemoveStudentAsync(int classId, int studentId)
+    public async Task RemoveStudentAsync(int classId, int studentId, CancellationToken ct = default)
     {
-        if (await _classRepository.GetByIdAsync(classId) is null)
-            throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
+        // Serialise removal for the same class so the delete-enrollment →
+        // decrement-count pair is not interleaved with a concurrent enrolment.
+        var sem = _enrollmentLock.GetSemaphore(classId);
+        await sem.WaitAsync();
+        try
+        {
+            if (await _classRepository.GetByIdAsync(classId) is null)
+                throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
 
-        if (!await _enrollmentRepository.DeleteAsync(classId, studentId))
-            throw new AppException(ErrorCode.ENROLLMENT_NOT_EXISTED);
+            if (!await _enrollmentRepository.DeleteAsync(classId, studentId))
+                throw new AppException(ErrorCode.ENROLLMENT_NOT_EXISTED);
 
-        await _classRepository.UpdateEnrollmentCountAsync(classId, -1);
+            await _classRepository.UpdateEnrollmentCountAsync(classId, -1);
+        }
+        finally
+        {
+            sem.Release();
+        }
     }
 
     // ------------------------------------------------------------------ //

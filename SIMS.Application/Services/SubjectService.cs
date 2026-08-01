@@ -15,13 +15,13 @@ public class SubjectService : ISubjectService
         _subjectRepository = subjectRepository;
     }
 
-    public async Task<IEnumerable<SubjectResponse>> GetAllAsync()
+    public async Task<IEnumerable<SubjectResponse>> GetAllAsync(CancellationToken ct = default)
     {
         var subjects = await _subjectRepository.GetAllAsync();
         return subjects.Select(MapToResponse);
     }
 
-    public async Task<SubjectResponse> CreateAsync(CreateSubjectRequest request)
+    public async Task<SubjectResponse> CreateAsync(CreateSubjectRequest request, CancellationToken ct = default)
     {
         var subjectCode = request.SubjectCode.Trim().ToUpperInvariant();
 
@@ -48,7 +48,7 @@ public class SubjectService : ISubjectService
         return MapToResponse(subject);
     }
 
-    public async Task DeleteAsync(int subjectId)
+    public async Task DeleteAsync(int subjectId, CancellationToken ct = default)
     {
         if (!await _subjectRepository.DeleteAsync(subjectId))
             throw new AppException(ErrorCode.SUBJECT_NOT_EXISTED);

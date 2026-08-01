@@ -33,13 +33,13 @@ public class PermissionService : IPermissionService
         _roleRepository = roleRepository;
     }
 
-    public async Task<IEnumerable<PermissionResponse>> GetAllAsync()
+    public async Task<IEnumerable<PermissionResponse>> GetAllAsync(CancellationToken ct = default)
     {
         var permissions = await _permissionRepository.GetAllAsync();
         return permissions.Select(MapToResponse);
     }
 
-    public async Task<PermissionResponse> CreateAsync(CreatePermissionRequest request)
+    public async Task<PermissionResponse> CreateAsync(CreatePermissionRequest request, CancellationToken ct = default)
     {
         // Names are compared case-insensitively everywhere, so normalise on write to
         // match the SCREAMING_SNAKE_CASE convention the seed data uses.
@@ -62,7 +62,8 @@ public class PermissionService : IPermissionService
 
     public async Task<PermissionResponse> UpdateAsync(
         int permissionId,
-        UpdatePermissionRequest request)
+        UpdatePermissionRequest request,
+        CancellationToken ct = default)
     {
         var permission = await _permissionRepository.GetByIdAsync(permissionId)
                          ?? throw new AppException(ErrorCode.PERMISSION_NOT_EXISTED);
@@ -92,7 +93,8 @@ public class PermissionService : IPermissionService
 
     public async Task<RolePermissionsResponse> AssignToRoleAsync(
         int roleId,
-        AssignPermissionRequest request)
+        AssignPermissionRequest request,
+        CancellationToken ct = default)
     {
         var role = await _roleRepository.GetByIdAsync(roleId)
                    ?? throw new AppException(ErrorCode.ROLE_NOT_EXISTED);

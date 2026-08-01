@@ -22,7 +22,7 @@ public class CourseService : ICourseService
         _userRepository = userRepository;
     }
 
-    public async Task<IEnumerable<CourseResponse>> GetAllAsync()
+    public async Task<IEnumerable<CourseResponse>> GetAllAsync(CancellationToken ct = default)
     {
         var courses = await _courseRepository.GetAllAsync();
 
@@ -40,7 +40,7 @@ public class CourseService : ICourseService
             instructorNameMap.TryGetValue(c.InstructorId, out var name) ? name : string.Empty));
     }
 
-    public async Task<CourseResponse> CreateAsync(CreateCourseRequest request)
+    public async Task<CourseResponse> CreateAsync(CreateCourseRequest request, CancellationToken ct = default)
     {
         var courseCode = request.CourseCode.Trim().ToUpperInvariant();
 
@@ -72,7 +72,7 @@ public class CourseService : ICourseService
         return MapToResponse(course, user?.FullName ?? string.Empty);
     }
 
-    public async Task DeleteAsync(int courseId)
+    public async Task DeleteAsync(int courseId, CancellationToken ct = default)
     {
         if (!await _courseRepository.DeleteAsync(courseId))
             throw new AppException(ErrorCode.COURSE_NOT_EXISTED);

@@ -1,42 +1,42 @@
-using Microsoft.Extensions.Options;
 using SIMS.Application.DTOs.Auth;
 using SIMS.Application.Interfaces.Repositories;
 using SIMS.Application.Interfaces.Services;
-using SIMS.Application.Settings;
 using SIMS.Domain.Entities;
 using SIMS.Shared.Exceptions;
 
 namespace SIMS.Application.Services;
 
+/// <summary>
+/// Handles the three authentication flows: login, logout, and token refresh.
+/// Token-revocation details (block-window calculation, persistence) are
+/// delegated entirely to <see cref="ITokenRevocationService"/>.
+/// </summary>
 public class AuthService : IAuthService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
-    private readonly IPermissionRepository _permissionRepository;
-    private readonly IPasswordHasher _passwordHasher;
-    private readonly ITokenService _tokenService;
-    private readonly IRevokedTokenRepository _revokedTokenRepository;
-    private readonly TokenPolicy _tokenPolicy;
+    private readonly IUserRepository          _userRepository;
+    private readonly IRoleRepository          _roleRepository;
+    private readonly IPermissionRepository    _permissionRepository;
+    private readonly IPasswordHasher          _passwordHasher;
+    private readonly ITokenService            _tokenService;
+    private readonly ITokenRevocationService  _revocationService;
 
     public AuthService(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
-        IPermissionRepository permissionRepository,
-        IPasswordHasher passwordHasher,
-        ITokenService tokenService,
-        IRevokedTokenRepository revokedTokenRepository,
-        IOptions<TokenPolicy> tokenPolicy)
+        IUserRepository         userRepository,
+        IRoleRepository         roleRepository,
+        IPermissionRepository   permissionRepository,
+        IPasswordHasher         passwordHasher,
+        ITokenService           tokenService,
+        ITokenRevocationService revocationService)
     {
-        _userRepository = userRepository;
-        _roleRepository = roleRepository;
+        _userRepository       = userRepository;
+        _roleRepository       = roleRepository;
         _permissionRepository = permissionRepository;
-        _passwordHasher = passwordHasher;
-        _tokenService = tokenService;
-        _revokedTokenRepository = revokedTokenRepository;
-        _tokenPolicy = tokenPolicy.Value;
+        _passwordHasher       = passwordHasher;
+        _tokenService         = tokenService;
+        _revocationService    = revocationService;
     }
 
-    public async Task<LoginResponse> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
         var username = request.Username.Trim().ToLowerInvariant();
 
@@ -52,41 +52,41 @@ public class AuthService : IAuthService
         var role = await _roleRepository.GetByIdAsync(user.RoleId)
                    ?? throw new AppException(ErrorCode.INVALID_CREDENTIALS);
 
-        var permissions    = await _permissionRepository.GetByRoleIdAsync(user.RoleId);
+        var permissions     = await _permissionRepository.GetByRoleIdAsync(user.RoleId);
         var permissionNames = permissions.Select(p => p.Name);
 
         var tokenResult = _tokenService.GenerateToken(user, role.Name, permissionNames);
 
         return new LoginResponse
         {
-            AccessToken = tokenResult.AccessToken
+            AccessToken = tokenResult.AccessToken,
+            ExpiresAt   = tokenResult.ExpiresAt
         };
     }
 
-    public async Task LogoutAsync(string rawToken, int userId)
+    public async Task LogoutAsync(string rawToken, CancellationToken ct = default)
     {
-        var jti = _tokenService.GetJtiFromToken(rawToken)
-                  ?? throw new AppException(ErrorCode.INVALID_TOKEN);
+        // Full validation: signature, issuer and audience are all verified.
+        // Lifetime is intentionally skipped — a just-expired token must still
+        // be revocable so the user can log out cleanly after a brief network
+        // delay. GetJtiFromToken / GetExpiryFromToken only parse (no signature
+        // check), so they must not be used here.
+        var principal = _tokenService.ValidateIgnoringLifetime(rawToken)
+                        ?? throw new AppException(ErrorCode.INVALID_TOKEN);
 
-        var expiry = _tokenService.GetExpiryFromToken(rawToken) ?? DateTime.UtcNow;
-
-        await RevokeAsync(jti, userId, expiry);
+        await _revocationService.RevokeAsync(
+            principal.Jti, principal.UserId, principal.ExpiresAt, ct);
     }
 
-    public async Task<LoginResponse> RefreshTokenAsync(RefreshTokenRequest request)
+    public async Task<LoginResponse> RefreshTokenAsync(
+        RefreshTokenRequest request, CancellationToken ct = default)
     {
         // Verifies signature, issuer and audience; skips only the lifetime check.
         var principal = _tokenService.ValidateIgnoringLifetime(request.AccessToken)
                         ?? throw new AppException(ErrorCode.INVALID_TOKEN);
 
-        // Bound how stale a token may be. Without this, any token ever issued could be
-        // traded for a live one indefinitely, which would make expiry meaningless.
-        var refreshDeadline = principal.ExpiresAt.AddMinutes(_tokenPolicy.RefreshWindowMinutes);
-        if (DateTime.UtcNow > refreshDeadline)
-            throw new AppException(ErrorCode.REFRESH_WINDOW_EXPIRED);
-
         // Catches both logout and a previous refresh of this same token.
-        if (await _revokedTokenRepository.IsRevokedAsync(principal.Jti))
+        if (await _revocationService.IsRevokedAsync(principal.Jti, ct))
             throw new AppException(ErrorCode.INVALID_TOKEN);
 
         var user = await _userRepository.GetByIdAsync(principal.UserId)
@@ -109,40 +109,13 @@ public class AuthService : IAuthService
         // Rotate: burn the presented token so it cannot be replayed or refreshed twice.
         // Done after the new token is minted so a failure here cannot strand the caller
         // without either token.
-        await RevokeAsync(principal.Jti, user.Id, principal.ExpiresAt);
+        await _revocationService.RevokeAsync(
+            principal.Jti, user.Id, principal.ExpiresAt, ct);
 
         return new LoginResponse
         {
-            AccessToken = tokenResult.AccessToken
+            AccessToken = tokenResult.AccessToken,
+            ExpiresAt   = tokenResult.ExpiresAt
         };
-    }
-
-    // ------------------------------------------------------------------ //
-
-    /// <summary>
-    /// Records a token as revoked.
-    ///
-    /// The stored ExpiresAt is pushed out to the end of the refresh window rather than
-    /// the token's own expiry. IsRevokedAsync ignores entries whose ExpiresAt has passed
-    /// (and RevokeAsync prunes them), so an entry kept only until the token's own expiry
-    /// would stop blocking exactly when the refresh endpoint still needs it — letting a
-    /// logged-out token be exchanged for a live one once it aged past exp.
-    /// </summary>
-    private async Task RevokeAsync(string jti, int userId, DateTime tokenExpiry)
-    {
-        var blockUntil = tokenExpiry.AddMinutes(_tokenPolicy.RefreshWindowMinutes);
-
-        // Past the refresh window the token is inert for every path, so there is
-        // nothing left to guard against.
-        if (blockUntil <= DateTime.UtcNow)
-            return;
-
-        await _revokedTokenRepository.RevokeAsync(new RevokedToken
-        {
-            Jti       = jti,
-            UserId    = userId,
-            RevokedAt = DateTime.UtcNow,
-            ExpiresAt = blockUntil
-        });
     }
 }

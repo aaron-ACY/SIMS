@@ -12,30 +12,36 @@ public class UserService : IUserService
     private const int MinUsernameLength = 6;
     private const int MinPasswordLength = 8;
 
-    private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
+    private readonly IUserRepository       _userRepository;
+    private readonly IRoleRepository       _roleRepository;
     private readonly IPermissionRepository _permissionRepository;
-    private readonly IPasswordHasher _passwordHasher;
-    private readonly IStudentRepository _studentRepository;
+    private readonly IPasswordHasher       _passwordHasher;
+    private readonly IStudentRepository    _studentRepository;
     private readonly IInstructorRepository _instructorRepository;
+    private readonly IEnrollmentRepository _enrollmentRepository;
+    private readonly IClassRepository      _classRepository;
 
     public UserService(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
+        IUserRepository       userRepository,
+        IRoleRepository       roleRepository,
         IPermissionRepository permissionRepository,
-        IPasswordHasher passwordHasher,
-        IStudentRepository studentRepository,
-        IInstructorRepository instructorRepository)
+        IPasswordHasher       passwordHasher,
+        IStudentRepository    studentRepository,
+        IInstructorRepository instructorRepository,
+        IEnrollmentRepository enrollmentRepository,
+        IClassRepository      classRepository)
     {
-        _userRepository = userRepository;
-        _roleRepository = roleRepository;
+        _userRepository       = userRepository;
+        _roleRepository       = roleRepository;
         _permissionRepository = permissionRepository;
-        _passwordHasher = passwordHasher;
-        _studentRepository = studentRepository;
+        _passwordHasher       = passwordHasher;
+        _studentRepository    = studentRepository;
         _instructorRepository = instructorRepository;
+        _enrollmentRepository = enrollmentRepository;
+        _classRepository      = classRepository;
     }
 
-    public async Task<UserProfileResponse> GetMyProfileAsync(int userId)
+    public async Task<UserProfileResponse> GetMyProfileAsync(int userId, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId)
                    ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
@@ -61,7 +67,7 @@ public class UserService : IUserService
         return MapToProfile(user, roleName, permissions.Select(p => p.Name), studentCode, instructorCode);
     }
 
-    public async Task<IEnumerable<UserProfileResponse>> GetAllAsync()
+    public async Task<IEnumerable<UserProfileResponse>> GetAllAsync(CancellationToken ct = default)
     {
         var users = await _userRepository.GetAllAsync();
         var roles = await _roleRepository.GetAllAsync();
@@ -87,7 +93,7 @@ public class UserService : IUserService
             instructorCode: null));
     }
 
-    public async Task<UserProfileResponse> CreateAsync(CreateUserRequest request)
+    public async Task<UserProfileResponse> CreateAsync(CreateUserRequest request, CancellationToken ct = default)
     {
         var username = request.Username.Trim().ToLowerInvariant();
         var email    = request.Email.Trim().ToLowerInvariant();
@@ -128,7 +134,7 @@ public class UserService : IUserService
         return MapToProfile(user, role.Name, permissions.Select(p => p.Name), null, null);
     }
 
-    public async Task<UserProfileResponse> UpdateMyInfoAsync(int userId, UpdateMyInfoRequest request)
+    public async Task<UserProfileResponse> UpdateMyInfoAsync(int userId, UpdateMyInfoRequest request, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId)
                    ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
@@ -154,14 +160,46 @@ public class UserService : IUserService
         return MapToProfile(user, role?.Name ?? string.Empty, permissions.Select(p => p.Name), null, null);
     }
 
-    public async Task DeleteAsync(int userId, int currentUserId)
+    public async Task DeleteAsync(int userId, int currentUserId, CancellationToken ct = default)
     {
         // Guard against an admin locking themselves out of the system.
         if (userId == currentUserId)
             throw new AppException(ErrorCode.CANNOT_DELETE_SELF);
 
-        _ = await _userRepository.GetByIdAsync(userId)
-            ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        var user = await _userRepository.GetByIdAsync(userId)
+                   ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
+
+        var role = await _roleRepository.GetByIdAsync(user.RoleId);
+        var roleName = role?.Name ?? string.Empty;
+
+        // ── Check dependents + cascade-delete the profile record ─────── //
+        if (roleName == Roles.Student)
+        {
+            var student = await _studentRepository.GetByUserIdAsync(userId);
+            if (student is not null)
+            {
+                // Block deletion when the student is still enrolled in classes.
+                if (await _enrollmentRepository.ExistsActiveForStudentAsync(student.Id))
+                    throw new AppException(ErrorCode.USER_HAS_ACTIVE_ENROLLMENTS);
+
+                await _studentRepository.DeleteAsync(student.Id);
+            }
+        }
+        else if (roleName == Roles.Instructor)
+        {
+            var instructor = await _instructorRepository.GetByUserIdAsync(userId);
+            if (instructor is not null)
+            {
+                // Block deletion when the instructor is still assigned to active classes.
+                var activeClasses = (await _classRepository.GetAllAsync())
+                    .Any(c => c.InstructorId == instructor.Id && c.IsActive);
+
+                if (activeClasses)
+                    throw new AppException(ErrorCode.USER_HAS_ACTIVE_CLASSES);
+
+                await _instructorRepository.DeleteAsync(instructor.Id);
+            }
+        }
 
         await _userRepository.DeleteAsync(userId);
     }

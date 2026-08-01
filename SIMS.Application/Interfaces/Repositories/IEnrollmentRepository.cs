@@ -14,4 +14,10 @@ public interface IEnrollmentRepository
     /// Returns false when no active enrollment is found.
     /// </summary>
     Task<bool> DeleteAsync(int classId, int studentId);
+
+    /// <summary>
+    /// Returns <c>true</c> when the student has at least one active enrollment.
+    /// Used to guard against deleting a student who is still enrolled in classes.
+    /// </summary>
+    Task<bool> ExistsActiveForStudentAsync(int studentId);
 }
