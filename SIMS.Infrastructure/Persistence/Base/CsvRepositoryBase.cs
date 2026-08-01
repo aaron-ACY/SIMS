@@ -76,18 +76,54 @@ public abstract class CsvRepositoryBase<T> where T : class
         return map;
     }
 
+    // ── Lock-free core I/O ─────────────────────────────────────────────── //
+    // These two methods perform raw file I/O without acquiring the semaphore.
+    // They must only be called by a method that already holds _lock.
+
+    private async Task<List<T>> ReadCoreAsync()
+    {
+        if (!File.Exists(_filePath))
+            return [];
+
+        using var reader = new StreamReader(_filePath);
+        using var csv    = new CsvReader(reader, CsvConfig);
+        csv.Context.RegisterClassMap(Map);
+        return csv.GetRecords<T>().ToList();
+    }
+
+    private async Task WriteCoreAsync(IEnumerable<T> records)
+    {
+        await using var writer = new StreamWriter(_filePath, append: false);
+        await using var csv    = new CsvWriter(writer, CsvConfig);
+        csv.Context.RegisterClassMap(Map);
+        await csv.WriteRecordsAsync(records);
+    }
+
+    // ── Public locked APIs ─────────────────────────────────────────────── //
+
+    /// <summary>Pure read — acquires and immediately releases the lock.</summary>
     protected async Task<List<T>> ReadAllAsync()
+    {
+        await _lock.WaitAsync();
+        try   { return await ReadCoreAsync(); }
+        finally { _lock.Release(); }
+    }
+
+    /// <summary>
+    /// Atomic read-modify-write: acquires the semaphore once and holds it
+    /// for the full read → mutate → write cycle, so no concurrent writer
+    /// can interleave between the read and the write.
+    /// Use this for every mutation — never call ReadAllAsync + WriteAllAsync
+    /// as separate operations.
+    /// </summary>
+    protected async Task ReadModifyWriteAsync(Action<List<T>> mutate)
     {
         await _lock.WaitAsync();
         try
         {
-            if (!File.Exists(_filePath))
-                return [];
-
-            using var reader = new StreamReader(_filePath);
-            using var csv = new CsvReader(reader, CsvConfig);
-            csv.Context.RegisterClassMap(Map);
-            return csv.GetRecords<T>().ToList();
+            var records = await ReadCoreAsync();
+            mutate(records);
+            await WriteCoreAsync(records);
         }
         finally
         {
@@ -95,15 +131,23 @@ public abstract class CsvRepositoryBase<T> where T : class
         }
     }
 
-    protected async Task WriteAllAsync(IEnumerable<T> records)
+    /// <summary>
+    /// Atomic read-modify-write for operations that return <c>bool</c>
+    /// (typically Add-or-update and Delete).
+    /// Convention: <paramref name="mutate"/> returns <c>true</c> when it
+    /// actually changed the list (triggering a write) and <c>false</c> when
+    /// the target was not found (skipping the write).
+    /// </summary>
+    protected async Task<bool> ReadModifyWriteAsync(Func<List<T>, bool> mutate)
     {
         await _lock.WaitAsync();
         try
         {
-            await using var writer = new StreamWriter(_filePath, append: false);
-            await using var csv = new CsvWriter(writer, CsvConfig);
-            csv.Context.RegisterClassMap(Map);
-            await csv.WriteRecordsAsync(records);
+            var records = await ReadCoreAsync();
+            var changed = mutate(records);
+            if (changed)
+                await WriteCoreAsync(records);
+            return changed;
         }
         finally
         {

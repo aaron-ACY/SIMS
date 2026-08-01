@@ -33,34 +33,32 @@ public class StudentRepository : CsvRepositoryBase<Student>, IStudentRepository
             string.Equals(s.StudentCode, studentCode, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task AddAsync(Student student)
-    {
-        var students = await ReadAllAsync();
-        student.Id        = students.Count == 0 ? 1 : students.Max(s => s.Id) + 1;
-        student.CreatedAt = DateTime.UtcNow;
-        student.UpdatedAt = DateTime.UtcNow;
-        students.Add(student);
-        await WriteAllAsync(students);
-    }
+    public Task AddAsync(Student student) =>
+        ReadModifyWriteAsync(students =>
+        {
+            student.Id        = students.Count == 0 ? 1 : students.Max(s => s.Id) + 1;
+            student.CreatedAt = DateTime.UtcNow;
+            student.UpdatedAt = DateTime.UtcNow;
+            students.Add(student);
+        });
 
-    public async Task UpdateAsync(Student student)
-    {
-        var students = await ReadAllAsync();
-        var index = students.FindIndex(s => s.Id == student.Id);
-        if (index < 0) return;
-        student.UpdatedAt = DateTime.UtcNow;
-        students[index] = student;
-        await WriteAllAsync(students);
-    }
+    public Task UpdateAsync(Student student) =>
+        ReadModifyWriteAsync(students =>
+        {
+            var index = students.FindIndex(s => s.Id == student.Id);
+            if (index < 0) return false;
+            student.UpdatedAt  = DateTime.UtcNow;
+            students[index]    = student;
+            return true;
+        });
 
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var students = await ReadAllAsync();
-        var index = students.FindIndex(s => s.Id == id);
-        if (index < 0) return false;
-        students.RemoveAt(index);
-        await WriteAllAsync(students);
-        return true;
-    }
+    public Task<bool> DeleteAsync(int id) =>
+        ReadModifyWriteAsync(students =>
+        {
+            var index = students.FindIndex(s => s.Id == id);
+            if (index < 0) return false;
+            students.RemoveAt(index);
+            return true;
+        });
 }
 

@@ -34,33 +34,31 @@ public class UserRepository : CsvRepositoryBase<User>, IUserRepository
     public Task<IEnumerable<User>> GetAllAsync() =>
         ReadAllAsync().ContinueWith(t => t.Result.AsEnumerable());
 
-    public async Task AddAsync(User user)
-    {
-        var users = await ReadAllAsync();
-        user.Id = users.Count == 0 ? 1 : users.Max(u => u.Id) + 1;
-        user.CreatedAt = DateTime.UtcNow;
-        user.UpdatedAt = DateTime.UtcNow;
-        users.Add(user);
-        await WriteAllAsync(users);
-    }
+    public Task AddAsync(User user) =>
+        ReadModifyWriteAsync(users =>
+        {
+            user.Id        = users.Count == 0 ? 1 : users.Max(u => u.Id) + 1;
+            user.CreatedAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
+            users.Add(user);
+        });
 
-    public async Task UpdateAsync(User user)
-    {
-        var users = await ReadAllAsync();
-        var index = users.FindIndex(u => u.Id == user.Id);
-        if (index < 0) return;
-        user.UpdatedAt = DateTime.UtcNow;
-        users[index] = user;
-        await WriteAllAsync(users);
-    }
+    public Task UpdateAsync(User user) =>
+        ReadModifyWriteAsync(users =>
+        {
+            var index = users.FindIndex(u => u.Id == user.Id);
+            if (index < 0) return false;
+            user.UpdatedAt = DateTime.UtcNow;
+            users[index]   = user;
+            return true;
+        });
 
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var users = await ReadAllAsync();
-        var index = users.FindIndex(u => u.Id == id);
-        if (index < 0) return false;
-        users.RemoveAt(index);
-        await WriteAllAsync(users);
-        return true;
-    }
+    public Task<bool> DeleteAsync(int id) =>
+        ReadModifyWriteAsync(users =>
+        {
+            var index = users.FindIndex(u => u.Id == id);
+            if (index < 0) return false;
+            users.RemoveAt(index);
+            return true;
+        });
 }

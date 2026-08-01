@@ -25,4 +25,38 @@ public class InstructorRepository : CsvRepositoryBase<Instructor>, IInstructorRe
         var instructors = await ReadAllAsync();
         return instructors.FirstOrDefault(i => i.UserId == userId);
     }
+
+    public async Task<Instructor?> GetByInstructorCodeAsync(string instructorCode)
+    {
+        var instructors = await ReadAllAsync();
+        return instructors.FirstOrDefault(
+            i => string.Equals(i.InstructorCode, instructorCode, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public Task AddAsync(Instructor instructor) =>
+        ReadModifyWriteAsync(instructors =>
+        {
+            instructor.Id        = instructors.Count == 0 ? 1 : instructors.Max(i => i.Id) + 1;
+            instructor.CreatedAt = DateTime.UtcNow;
+            instructor.UpdatedAt = DateTime.UtcNow;
+            instructors.Add(instructor);
+        });
+
+    public Task<bool> UpdateAsync(Instructor instructor) =>
+        ReadModifyWriteAsync(instructors =>
+        {
+            var index = instructors.FindIndex(i => i.Id == instructor.Id);
+            if (index < 0) return false;
+            instructors[index] = instructor;
+            return true;
+        });
+
+    public Task<bool> DeleteAsync(int id) =>
+        ReadModifyWriteAsync(instructors =>
+        {
+            var index = instructors.FindIndex(i => i.Id == id);
+            if (index < 0) return false;
+            instructors.RemoveAt(index);
+            return true;
+        });
 }

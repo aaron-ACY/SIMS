@@ -29,21 +29,19 @@ public class GradeRepository : CsvRepositoryBase<Grade>, IGradeRepository
         return grades.Where(g => g.StudentId == studentId);
     }
 
-    public async Task AddAsync(Grade grade)
-    {
-        var grades = await ReadAllAsync();
-        grade.Id = grades.Count == 0 ? 1 : grades.Max(g => g.Id) + 1;
-        grades.Add(grade);
-        await WriteAllAsync(grades);
-    }
+    public Task AddAsync(Grade grade) =>
+        ReadModifyWriteAsync(grades =>
+        {
+            grade.Id = grades.Count == 0 ? 1 : grades.Max(g => g.Id) + 1;
+            grades.Add(grade);
+        });
 
-    public async Task<bool> UpdateAsync(Grade grade)
-    {
-        var grades = await ReadAllAsync();
-        var index = grades.FindIndex(g => g.Id == grade.Id);
-        if (index < 0) return false;
-        grades[index] = grade;
-        await WriteAllAsync(grades);
-        return true;
-    }
+    public Task<bool> UpdateAsync(Grade grade) =>
+        ReadModifyWriteAsync(grades =>
+        {
+            var index = grades.FindIndex(g => g.Id == grade.Id);
+            if (index < 0) return false;
+            grades[index] = grade;
+            return true;
+        });
 }

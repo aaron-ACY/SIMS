@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SIMS.Application.Interfaces.Repositories;
@@ -51,7 +52,17 @@ public static class DependencyInjection
         services.AddSingleton<IUserRepository,          UserRepository>();
         services.AddSingleton<IRoleRepository,          RoleRepository>();
         services.AddSingleton<IPermissionRepository,    PermissionRepository>();
-        services.AddSingleton<IRevokedTokenRepository,  RevokedTokenRepository>();
+
+        // RevokedTokenRepository is wrapped by CachedRevokedTokenRepository so
+        // IsRevokedAsync (called on every authenticated request) reads from an
+        // in-process memory cache instead of parsing the CSV on each call.
+        services.AddMemoryCache();
+        services.AddSingleton<RevokedTokenRepository>();
+        services.AddSingleton<IRevokedTokenRepository>(sp =>
+            new CachedRevokedTokenRepository(
+                sp.GetRequiredService<RevokedTokenRepository>(),
+                sp.GetRequiredService<IMemoryCache>()));
+
         services.AddSingleton<IStudentRepository,       StudentRepository>();
         services.AddSingleton<IInstructorRepository,    InstructorRepository>();
         services.AddSingleton<ICourseRepository,        CourseRepository>();
@@ -65,6 +76,11 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService,   JwtTokenService>();
 
         // ── Application services ─────────────────────────────────────────── //
+        // EnrollmentSemaphoreService must be Singleton — it holds per-class
+        // SemaphoreSlim instances that coordinate concurrent enrolment requests
+        // across all HTTP request scopes.
+        services.AddSingleton<EnrollmentSemaphoreService>();
+        services.AddScoped<ITokenRevocationService, TokenRevocationService>();
         services.AddScoped<IAuthService,       AuthService>();
         services.AddScoped<IUserService,       UserService>();
         services.AddScoped<IStudentService,    StudentService>();

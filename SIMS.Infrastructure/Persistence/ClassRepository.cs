@@ -27,25 +27,29 @@ public class ClassRepository : CsvRepositoryBase<Class>, IClassRepository
             string.Equals(c.ClassCode, classCode, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task AddAsync(Class schoolClass)
-    {
-        var classes = await ReadAllAsync();
-        schoolClass.Id        = classes.Count == 0 ? 1 : classes.Max(c => c.Id) + 1;
-        schoolClass.CreatedAt = DateTime.UtcNow;
-        schoolClass.UpdatedAt = DateTime.UtcNow;
-        classes.Add(schoolClass);
-        await WriteAllAsync(classes);
-    }
+    public Task AddAsync(Class schoolClass) =>
+        ReadModifyWriteAsync(classes =>
+        {
+            schoolClass.Id        = classes.Count == 0 ? 1 : classes.Max(c => c.Id) + 1;
+            schoolClass.CreatedAt = DateTime.UtcNow;
+            schoolClass.UpdatedAt = DateTime.UtcNow;
+            classes.Add(schoolClass);
+        });
 
-    public async Task<bool> UpdateEnrollmentCountAsync(int classId, int delta)
-    {
-        var classes = await ReadAllAsync();
-        var schoolClass = classes.FirstOrDefault(c => c.Id == classId);
-        if (schoolClass is null) return false;
+    public Task<bool> UpdateEnrollmentCountAsync(int classId, int delta) =>
+        ReadModifyWriteAsync(classes =>
+        {
+            var schoolClass = classes.FirstOrDefault(c => c.Id == classId);
+            if (schoolClass is null) return false;
 
-        schoolClass.CurrentEnrollment += delta;
-        schoolClass.UpdatedAt          = DateTime.UtcNow;
-        await WriteAllAsync(classes);
-        return true;
-    }
+            // Defence-in-depth: re-verify capacity inside the repository lock
+            // so a counter can never exceed MaxEnrollment even if the service-layer
+            // check is somehow bypassed.
+            if (delta > 0 && schoolClass.CurrentEnrollment >= schoolClass.MaxEnrollment)
+                return false;
+
+            schoolClass.CurrentEnrollment += delta;
+            schoolClass.UpdatedAt          = DateTime.UtcNow;
+            return true;
+        });
 }

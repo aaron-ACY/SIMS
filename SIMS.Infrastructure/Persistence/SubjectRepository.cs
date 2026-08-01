@@ -27,23 +27,21 @@ public class SubjectRepository : CsvRepositoryBase<Subject>, ISubjectRepository
             string.Equals(s.SubjectCode, subjectCode, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task AddAsync(Subject subject)
-    {
-        var subjects = await ReadAllAsync();
-        subject.Id        = subjects.Count == 0 ? 1 : subjects.Max(s => s.Id) + 1;
-        subject.CreatedAt = DateTime.UtcNow;
-        subject.UpdatedAt = DateTime.UtcNow;
-        subjects.Add(subject);
-        await WriteAllAsync(subjects);
-    }
+    public Task AddAsync(Subject subject) =>
+        ReadModifyWriteAsync(subjects =>
+        {
+            subject.Id        = subjects.Count == 0 ? 1 : subjects.Max(s => s.Id) + 1;
+            subject.CreatedAt = DateTime.UtcNow;
+            subject.UpdatedAt = DateTime.UtcNow;
+            subjects.Add(subject);
+        });
 
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var subjects = await ReadAllAsync();
-        var index = subjects.FindIndex(s => s.Id == id);
-        if (index < 0) return false;
-        subjects.RemoveAt(index);
-        await WriteAllAsync(subjects);
-        return true;
-    }
+    public Task<bool> DeleteAsync(int id) =>
+        ReadModifyWriteAsync(subjects =>
+        {
+            var index = subjects.FindIndex(s => s.Id == id);
+            if (index < 0) return false;
+            subjects.RemoveAt(index);
+            return true;
+        });
 }

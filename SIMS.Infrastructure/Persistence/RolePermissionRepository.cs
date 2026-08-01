@@ -30,11 +30,10 @@ public class RolePermissionRepository : CsvRepositoryBase<RolePermission>, IRole
         return all.Any(rp => rp.RoleId == roleId && rp.PermissionId == permissionId);
     }
 
-    public async Task AddAsync(RolePermission rolePermission)
-    {
-        var all = await ReadAllAsync();
-        rolePermission.Id = all.Count == 0 ? 1 : all.Max(rp => rp.Id) + 1;
-        all.Add(rolePermission);
-        await WriteAllAsync(all);
-    }
+    public Task AddAsync(RolePermission rolePermission) =>
+        ReadModifyWriteAsync(all =>
+        {
+            rolePermission.Id = all.Count == 0 ? 1 : all.Max(rp => rp.Id) + 1;
+            all.Add(rolePermission);
+        });
 }

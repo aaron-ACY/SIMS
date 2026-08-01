@@ -42,20 +42,19 @@ public class PermissionRepository : CsvRepositoryBase<Permission>, IPermissionRe
             string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task AddAsync(Permission permission)
-    {
-        var permissions = await ReadAllAsync();
-        permission.Id = permissions.Count == 0 ? 1 : permissions.Max(p => p.Id) + 1;
-        permissions.Add(permission);
-        await WriteAllAsync(permissions);
-    }
+    public Task AddAsync(Permission permission) =>
+        ReadModifyWriteAsync(permissions =>
+        {
+            permission.Id = permissions.Count == 0 ? 1 : permissions.Max(p => p.Id) + 1;
+            permissions.Add(permission);
+        });
 
-    public async Task UpdateAsync(Permission permission)
-    {
-        var permissions = await ReadAllAsync();
-        var index = permissions.FindIndex(p => p.Id == permission.Id);
-        if (index < 0) return;
-        permissions[index] = permission;
-        await WriteAllAsync(permissions);
-    }
+    public Task UpdateAsync(Permission permission) =>
+        ReadModifyWriteAsync(permissions =>
+        {
+            var index = permissions.FindIndex(p => p.Id == permission.Id);
+            if (index < 0) return false;
+            permissions[index] = permission;
+            return true;
+        });
 }

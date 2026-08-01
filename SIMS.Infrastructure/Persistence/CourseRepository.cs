@@ -27,23 +27,21 @@ public class CourseRepository : CsvRepositoryBase<Course>, ICourseRepository
             string.Equals(c.CourseCode, courseCode, StringComparison.OrdinalIgnoreCase));
     }
 
-    public async Task AddAsync(Course course)
-    {
-        var courses = await ReadAllAsync();
-        course.Id = courses.Count == 0 ? 1 : courses.Max(c => c.Id) + 1;
-        course.CreatedAt = DateTime.UtcNow;
-        course.UpdatedAt = DateTime.UtcNow;
-        courses.Add(course);
-        await WriteAllAsync(courses);
-    }
+    public Task AddAsync(Course course) =>
+        ReadModifyWriteAsync(courses =>
+        {
+            course.Id        = courses.Count == 0 ? 1 : courses.Max(c => c.Id) + 1;
+            course.CreatedAt = DateTime.UtcNow;
+            course.UpdatedAt = DateTime.UtcNow;
+            courses.Add(course);
+        });
 
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var courses = await ReadAllAsync();
-        var index = courses.FindIndex(c => c.Id == id);
-        if (index < 0) return false;
-        courses.RemoveAt(index);
-        await WriteAllAsync(courses);
-        return true;
-    }
+    public Task<bool> DeleteAsync(int id) =>
+        ReadModifyWriteAsync(courses =>
+        {
+            var index = courses.FindIndex(c => c.Id == id);
+            if (index < 0) return false;
+            courses.RemoveAt(index);
+            return true;
+        });
 }

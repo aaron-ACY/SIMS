@@ -28,7 +28,6 @@ public class JwtTokenService : ITokenService
         var jti    = Guid.NewGuid().ToString();
 
         var header = new JwtHeader(creds);
-        header.Remove("typ");
 
         var claims = new List<Claim>
         {

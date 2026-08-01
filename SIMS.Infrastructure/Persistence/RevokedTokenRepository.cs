@@ -21,18 +21,20 @@ public class RevokedTokenRepository : CsvRepositoryBase<RevokedToken>, IRevokedT
             t.ExpiresAt > DateTime.UtcNow);
     }
 
-    public async Task RevokeAsync(RevokedToken token)
-    {
-        var tokens = await ReadAllAsync();
+    public Task RevokeAsync(RevokedToken token) =>
+        ReadModifyWriteAsync(tokens =>
+        {
+            // Prune expired entries on every write to keep the file lean.
+            var active = tokens
+                .Where(t => t.ExpiresAt > DateTime.UtcNow)
+                .ToList();
 
-        // Prune expired entries on every write to keep the file lean.
-        var active = tokens
-            .Where(t => t.ExpiresAt > DateTime.UtcNow)
-            .ToList();
+            token.Id = active.Count == 0 ? 1 : active.Max(t => t.Id) + 1;
+            active.Add(token);
 
-        token.Id = active.Count == 0 ? 1 : active.Max(t => t.Id) + 1;
-        active.Add(token);
-
-        await WriteAllAsync(active);
-    }
+            // Replace the list contents in-place so the base class writes
+            // the pruned + appended version.
+            tokens.Clear();
+            tokens.AddRange(active);
+        });
 }

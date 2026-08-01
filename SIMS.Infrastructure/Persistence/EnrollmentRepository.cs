@@ -30,25 +30,27 @@ public class EnrollmentRepository : CsvRepositoryBase<Enrollment>, IEnrollmentRe
             e.ClassId == classId && e.StudentId == studentId && e.IsActive);
     }
 
-    public async Task AddAsync(Enrollment enrollment)
-    {
-        var enrollments = await ReadAllAsync();
-        enrollment.Id = enrollments.Count == 0 ? 1 : enrollments.Max(e => e.Id) + 1;
-        enrollments.Add(enrollment);
-        await WriteAllAsync(enrollments);
-    }
+    public Task<bool> ExistsActiveForStudentAsync(int studentId) =>
+        ReadAllAsync().ContinueWith(t =>
+            t.Result.Any(e => e.StudentId == studentId && e.IsActive));
 
-    public async Task<bool> DeleteAsync(int classId, int studentId)
-    {
-        var enrollments = await ReadAllAsync();
-        var index = enrollments.FindIndex(
-            e => e.ClassId == classId && e.StudentId == studentId && e.IsActive);
+    public Task AddAsync(Enrollment enrollment) =>
+        ReadModifyWriteAsync(enrollments =>
+        {
+            enrollment.Id = enrollments.Count == 0 ? 1 : enrollments.Max(e => e.Id) + 1;
+            enrollments.Add(enrollment);
+        });
 
-        if (index < 0) return false;
+    public Task<bool> DeleteAsync(int classId, int studentId) =>
+        ReadModifyWriteAsync(enrollments =>
+        {
+            var index = enrollments.FindIndex(
+                e => e.ClassId == classId && e.StudentId == studentId && e.IsActive);
 
-        // Soft-delete: mark inactive rather than removing the record.
-        enrollments[index].IsActive = false;
-        await WriteAllAsync(enrollments);
-        return true;
-    }
+            if (index < 0) return false;
+
+            // Soft-delete: mark inactive rather than removing the record.
+            enrollments[index].IsActive = false;
+            return true;
+        });
 }
