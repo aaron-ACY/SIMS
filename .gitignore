@@ -40,6 +40,16 @@ ehthumbs.db
 Desktop.ini
 
 # ===========================
+# Secrets — never commit these
+# ===========================
+# Local override files that may contain secrets
+appsettings.*.local.json
+appsettings.local.json
+# .env files if ever introduced
+.env
+.env.*
+
+# ===========================
 # Temporary files
 # ===========================
 *.tmp
