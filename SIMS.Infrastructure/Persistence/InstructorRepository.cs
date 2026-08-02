@@ -33,6 +33,13 @@ public class InstructorRepository : CsvRepositoryBase<Instructor>, IInstructorRe
             i => string.Equals(i.InstructorCode, instructorCode, StringComparison.OrdinalIgnoreCase));
     }
 
+    public async Task<Instructor?> GetByEmailAsync(string email)
+    {
+        var instructors = await ReadAllAsync();
+        return instructors.FirstOrDefault(i =>
+            string.Equals(i.Email, email, StringComparison.OrdinalIgnoreCase));
+    }
+
     public Task AddAsync(Instructor instructor) =>
         ReadModifyWriteAsync(instructors =>
         {

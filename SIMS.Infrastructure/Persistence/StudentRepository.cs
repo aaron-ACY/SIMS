@@ -33,6 +33,13 @@ public class StudentRepository : CsvRepositoryBase<Student>, IStudentRepository
             string.Equals(s.StudentCode, studentCode, StringComparison.OrdinalIgnoreCase));
     }
 
+    public async Task<Student?> GetByEmailAsync(string email)
+    {
+        var students = await ReadAllAsync();
+        return students.FirstOrDefault(s =>
+            string.Equals(s.Email, email, StringComparison.OrdinalIgnoreCase));
+    }
+
     public Task AddAsync(Student student) =>
         ReadModifyWriteAsync(students =>
         {
