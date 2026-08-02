@@ -112,7 +112,7 @@ public class ClassService : IClassService
 
     public async Task<ClassResponse> CreateAsync(CreateClassRequest request, CancellationToken ct = default)
     {
-        var classCode = request.ClassCode.Trim().ToUpperInvariant();
+        var classCode = (request.ClassCode?.Trim() ?? string.Empty).ToUpperInvariant();
 
         if (await _classRepository.GetByClassCodeAsync(classCode) is not null)
             throw new AppException(ErrorCode.CLASS_CODE_EXISTED);
@@ -129,9 +129,9 @@ public class ClassService : IClassService
             SubjectId        = subject.Id,
             InstructorId     = instructor.Id,
             Semester         = request.Semester,
-            AcademicYear     = request.AcademicYear.Trim(),
-            Room             = request.Room.Trim(),
-            Schedule         = request.Schedule.Trim(),
+            AcademicYear     = request.AcademicYear?.Trim() ?? string.Empty,
+            Room             = request.Room?.Trim()         ?? string.Empty,
+            Schedule         = request.Schedule?.Trim()     ?? string.Empty,
             MaxEnrollment    = request.MaxEnrollment,
             CurrentEnrollment = 0,
             IsActive         = true
