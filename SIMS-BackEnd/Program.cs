@@ -267,14 +267,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors(CorsPolicyName); // after HTTPS redirect, before rate-limiting and auth
-app.UseRateLimiter();   // before auth so limits apply regardless of token state
+app.UseCors(CorsPolicyName);
+app.UseRateLimiter(); 
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Attach [AllowAnonymous] to every mapped route whose template appears in
-// PublicEndpoints.All. Done here rather than as attributes on the actions so
-// the full set of unauthenticated entry points is readable in one place.
 app.MapControllers().Add(endpointBuilder =>
 {
     if (endpointBuilder is not RouteEndpointBuilder routeBuilder)

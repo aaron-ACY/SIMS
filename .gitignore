@@ -50,6 +50,11 @@ appsettings.local.json
 .env.*
 
 # ===========================
+# Runtime-generated data (never commit)
+# ===========================
+SIMS-BackEnd/Data/revoked_tokens.csv
+
+# ===========================
 # Temporary files
 # ===========================
 *.tmp
