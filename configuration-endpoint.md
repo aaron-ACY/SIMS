@@ -15,22 +15,33 @@
 
 JWT Secret **không được** lưu trong `appsettings.json`. Cần thiết lập qua **User Secrets** (dev) hoặc **biến môi trường** (prod).
 
-**Development — dùng User Secrets:**
-```bash
-# chạy trong thư mục SIMS-BackEnd/
-dotnet user-secrets set "Jwt:SecretKey" "<chuỗi-ngẫu-nhiên-tối-thiểu-32-ký-tự>"
+**Development — dùng User Secrets (chỉ cần làm 1 lần):**
+```powershell
+cd SIMS-BackEnd
+dotnet user-secrets set "Jwt:SecretKey" "super-secret-key-change-this-32chars!!"
+```
+
+> Key phải **tối thiểu 32 ký tự**. Thay chuỗi trên bằng bất kỳ chuỗi ngẫu nhiên nào dài hơn 32 ký tự.
+
+**Kiểm tra Secret đã được set chưa:**
+```powershell
+dotnet user-secrets list
 ```
 
 **Production — biến môi trường:**
-```bash
-export Jwt__SecretKey="<chuỗi-ngẫu-nhiên-tối-thiểu-32-ký-tự>"
+```powershell
+# Windows (PowerShell)
+$env:Jwt__SecretKey = "super-secret-key-change-this-32chars!!"
+
+# Linux / macOS
+export Jwt__SecretKey="super-secret-key-change-this-32chars!!"
 ```
 
 > Lưu ý: dùng dấu `__` (double underscore) khi đặt tên biến môi trường thay cho dấu `:`.
 
 ### 2.2 Khởi động API
 
-```bash
+```powershell
 cd SIMS-BackEnd
 
 # HTTP (port 5198)
@@ -158,13 +169,75 @@ InstructorCode, FirstName, LastName, DateOfBirth, Gender, Phone, City, Country, 
 
 | Method | Endpoint | Permission yêu cầu | Mô tả |
 |---|---|---|---|
-| GET | `/api/majors` | `VIEW_MAJOR` | Lấy danh sách tất cả major |
-| POST | `/api/majors` | `CREATE_MAJOR` | Tạo major mới |
-| DELETE | `/api/majors/{id}` | `DELETE_MAJOR` | Xoá major |
+| GET | `/api/majors` | `VIEW_MAJOR` | Lấy danh sách tất cả chuyên ngành |
+| POST | `/api/majors` | `CREATE_MAJOR` | Tạo chuyên ngành mới |
+| DELETE | `/api/majors/{id}` | `DELETE_MAJOR` | Xoá chuyên ngành |
+
+**Body tạo mới (POST):**
+```json
+{
+  "majorCode": "string",
+  "name": "string",
+  "description": "string",
+  "department": "string",
+  "totalCredits": 120
+}
+```
+
+> `totalCredits` phải nằm trong khoảng **1–300**.
+
+**Response mẫu:**
+```json
+{
+  "id": 1,
+  "majorCode": "CS",
+  "name": "Computer Science",
+  "description": "...",
+  "department": "Faculty of IT",
+  "totalCredits": 130,
+  "isActive": true
+}
+```
 
 ---
 
-### 3.6 Subjects — `/api/subjects`
+### 3.6 Courses — `/api/courses`
+
+| Method | Endpoint | Permission yêu cầu | Mô tả |
+|---|---|---|---|
+| GET | `/api/courses` | `VIEW_COURSES` | Lấy danh sách tất cả môn học |
+| POST | `/api/courses` | `CREATE_COURSE` | Tạo môn học mới |
+| DELETE | `/api/courses/{id}` | `DELETE_COURSE` | Xoá môn học |
+
+**Body tạo mới (POST):**
+```json
+{
+  "courseCode": "string",
+  "name": "string",
+  "description": "string",
+  "credits": 3,
+  "isRequired": true
+}
+```
+
+> `credits` phải nằm trong khoảng **1–10**.
+
+**Response mẫu:**
+```json
+{
+  "id": 1,
+  "courseCode": "CS101",
+  "name": "Introduction to Programming",
+  "description": "...",
+  "credits": 3,
+  "isRequired": true,
+  "isActive": true
+}
+```
+
+---
+
+### 3.7 Subjects — `/api/subjects`
 
 | Method | Endpoint | Permission yêu cầu | Mô tả |
 |---|---|---|---|
@@ -174,7 +247,7 @@ InstructorCode, FirstName, LastName, DateOfBirth, Gender, Phone, City, Country, 
 
 ---
 
-### 3.7 Classes — `/api/classes`
+### 3.8 Classes — `/api/classes`
 
 | Method | Endpoint | Permission yêu cầu | Mô tả |
 |---|---|---|---|
@@ -186,7 +259,7 @@ InstructorCode, FirstName, LastName, DateOfBirth, Gender, Phone, City, Country, 
 
 ---
 
-### 3.8 Grades — `/api/grades`
+### 3.9 Grades — `/api/grades`
 
 | Method | Endpoint | Permission yêu cầu | Mô tả |
 |---|---|---|---|
@@ -197,7 +270,7 @@ InstructorCode, FirstName, LastName, DateOfBirth, Gender, Phone, City, Country, 
 
 ---
 
-### 3.9 Permissions — `/api/permissions`
+### 3.10 Permissions — `/api/permissions`
 
 | Method | Endpoint | Permission yêu cầu | Mô tả |
 |---|---|---|---|
@@ -207,7 +280,7 @@ InstructorCode, FirstName, LastName, DateOfBirth, Gender, Phone, City, Country, 
 
 ---
 
-### 3.10 Roles — `/api/roles`
+### 3.11 Roles — `/api/roles`
 
 | Method | Endpoint | Permission yêu cầu | Mô tả |
 |---|---|---|---|
@@ -442,12 +515,15 @@ try {
 | `EDIT_INSTRUCTOR` | Sửa giảng viên |
 | `DELETE_INSTRUCTOR` | Xoá giảng viên |
 | `IMPORT_INSTRUCTORS` | Import giảng viên từ CSV |
-| `VIEW_MAJOR` | Xem danh sách course |
-| `CREATE_MAJOR` | Tạo course |
-| `DELETE_MAJOR` | Xoá course |
-| `VIEW_SUB` | Xem môn học |
-| `CREATE_SUB` | Tạo môn học |
-| `DELETE_SUB` | Xoá môn học |
+| `VIEW_MAJOR` | Xem danh sách chuyên ngành |
+| `CREATE_MAJOR` | Tạo chuyên ngành |
+| `DELETE_MAJOR` | Xoá chuyên ngành |
+| `VIEW_COURSES` | Xem danh sách môn học |
+| `CREATE_COURSE` | Tạo môn học |
+| `DELETE_COURSE` | Xoá môn học |
+| `VIEW_SUB` | Xem subjects |
+| `CREATE_SUB` | Tạo subject |
+| `DELETE_SUB` | Xoá subject |
 | `VIEW_CLA` | Xem lớp học |
 | `CREATE_CLASS` | Tạo lớp học |
 | `LIST_STU` | Xem sinh viên trong lớp |
