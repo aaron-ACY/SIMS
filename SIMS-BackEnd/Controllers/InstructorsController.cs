@@ -58,6 +58,32 @@ public class InstructorsController : ControllerBase
             ApiResponse<InstructorResponse>.Ok(instructor, "Instructor created successfully."));
     }
 
+    /// <summary>
+    /// Bulk-imports instructor profiles from a CSV file.
+    /// Expected columns (no header required): InstructorCode, FirstName, LastName,
+    /// DateOfBirth, Gender, Phone, City, Country, Email, Department, Degree.
+    /// Rows that fail validation or have duplicate codes/emails are skipped and
+    /// included in the response's Errors list.
+    /// </summary>
+    [HttpPost("import")]
+    [Authorize(Policy = Permissions.ImportInstructors)]
+    [ProducesResponseType(typeof(ApiResponse<ImportInstructorsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> ImportInstructors([FromForm] IFormFile? file, CancellationToken ct)
+    {
+        if (file is null || file.Length == 0)
+            return BadRequest(ApiResponse.Fail(SIMS.Shared.Exceptions.ErrorCode.VALIDATION_ERROR,
+                new[] { "No file was uploaded or the file is empty." }));
+
+        var result = await _instructorService.ImportAsync(file.OpenReadStream(), ct);
+        return Ok(ApiResponse<ImportInstructorsResponse>.Ok(result,
+            $"Import complete: {result.Imported} imported, {result.Skipped} skipped."));
+    }
+
     /// <summary>Updates an existing instructor record. All fields are optional.</summary>
     [HttpPut("{id:int}")]
     [Authorize(Policy = Permissions.EditInstructor)]

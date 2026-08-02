@@ -59,6 +59,32 @@ public class StudentsController : ControllerBase
     }
 
     /// <summary>
+    /// Bulk-imports student profiles from a CSV file.
+    /// Expected columns (no header required): StudentCode, FirstName, LastName,
+    /// DateOfBirth, Gender, Phone, City, Country, Email, Major.
+    /// Rows that fail validation or have duplicate codes/emails are skipped and
+    /// included in the response's Errors list.
+    /// </summary>
+    [HttpPost("import")]
+    [Authorize(Policy = Permissions.ImportStudents)]
+    [ProducesResponseType(typeof(ApiResponse<ImportStudentsResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> ImportStudents([FromForm] IFormFile? file, CancellationToken ct)
+    {
+        if (file is null || file.Length == 0)
+            return BadRequest(ApiResponse.Fail(SIMS.Shared.Exceptions.ErrorCode.VALIDATION_ERROR,
+                new[] { "No file was uploaded or the file is empty." }));
+
+        var result = await _studentService.ImportAsync(file.OpenReadStream(), ct);
+        return Ok(ApiResponse<ImportStudentsResponse>.Ok(result,
+            $"Import complete: {result.Imported} imported, {result.Skipped} skipped."));
+    }
+
+    /// <summary>
     /// Updates an existing student record.
     /// If StudentCode is provided it must still match BD + digits.
     /// </summary>

@@ -23,7 +23,6 @@ public class UsersController : ControllerBase
 
     /// <summary>
     /// Returns the profile of the currently authenticated user.
-    /// Email is loaded from the database — it is no longer stored in the JWT.
     /// Accessible by any authenticated role.
     /// </summary>
     [HttpGet("me")]
@@ -51,7 +50,45 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new user account.
+    /// Creates a student account and student profile in one request.
+    /// Requires the CREATE_USER permission.
+    /// </summary>
+    [HttpPost("student")]
+    [Authorize(Policy = Permissions.CreateUser)]
+    [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> CreateStudentUser([FromBody] CreateStudentUserRequest request, CancellationToken ct)
+    {
+        var profile = await _userService.CreateStudentUserAsync(request, ct);
+        return StatusCode(
+            StatusCodes.Status201Created,
+            ApiResponse<UserProfileResponse>.Ok(profile, "Student user created successfully."));
+    }
+
+    /// <summary>
+    /// Creates an instructor account and instructor profile in one request.
+    /// Requires the CREATE_USER permission.
+    /// </summary>
+    [HttpPost("instructor")]
+    [Authorize(Policy = Permissions.CreateUser)]
+    [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> CreateInstructorUser([FromBody] CreateInstructorUserRequest request, CancellationToken ct)
+    {
+        var profile = await _userService.CreateInstructorUserAsync(request, ct);
+        return StatusCode(
+            StatusCodes.Status201Created,
+            ApiResponse<UserProfileResponse>.Ok(profile, "Instructor user created successfully."));
+    }
+
+    /// <summary>
+    /// Creates a bare user account without a profile (Admin role or custom use).
     /// Requires the CREATE_USER permission.
     /// </summary>
     [HttpPost]
@@ -64,16 +101,13 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken ct)
     {
         var profile = await _userService.CreateAsync(request, ct);
-
-        // No GET /api/users/{id} endpoint exists to serve as the Location target,
-        // so a bare 201 is returned instead of a Location header pointing nowhere.
         return StatusCode(
             StatusCodes.Status201Created,
             ApiResponse<UserProfileResponse>.Ok(profile, "User created successfully."));
     }
 
     /// <summary>
-    /// Updates the personal information (email and name) of the authenticated caller.
+    /// Updates the personal information of the authenticated caller.
     /// Requires the EDIT_PROFILE permission.
     /// </summary>
     [HttpPut("me")]
@@ -86,7 +120,6 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> UpdateMyInfo([FromBody] UpdateMyInfoRequest request, CancellationToken ct)
     {
         var profile = await _userService.UpdateMyInfoAsync(GetCurrentUserId(), request, ct);
-
         return Ok(ApiResponse<UserProfileResponse>.Ok(profile, "Information updated successfully."));
     }
 
@@ -109,10 +142,6 @@ public class UsersController : ControllerBase
 
     // ------------------------------------------------------------------ //
 
-    /// <summary>
-    /// Reads the caller's user ID from the sub claim.
-    /// Claim mapping is disabled (see Program.cs), so the raw name is used.
-    /// </summary>
     private int GetCurrentUserId()
     {
         if (!int.TryParse(User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var userId))

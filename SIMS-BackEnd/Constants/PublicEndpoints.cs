@@ -17,6 +17,12 @@ public static class PublicEndpoints
     public const string Login = "/api/auth/login";
 
     /// <summary>
+    /// Self-service registration: the caller supplies a pre-loaded Gmail and receives
+    /// a JWT on success. Intentionally public — users have no token before they register.
+    /// </summary>
+    public const string Register = "/api/auth/register";
+
+    /// <summary>
     /// Takes an expired token, which [Authorize] would reject before the
     /// handler ran. Still fully validated inside AuthService.
     /// </summary>
@@ -42,6 +48,7 @@ public static class PublicEndpoints
     public static readonly string[] All =
     [
         Login,
+        Register,
         Refresh,
         Logout
     ];

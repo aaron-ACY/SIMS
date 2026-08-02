@@ -8,7 +8,7 @@ using SIMS.Shared.Models;
 namespace SIMS_BackEnd.Controllers;
 
 [ApiController]
-[Route("api/courses")]
+[Route("api/majors")]
 [Authorize]
 public class CoursesController : ControllerBase
 {
@@ -21,7 +21,7 @@ public class CoursesController : ControllerBase
 
     /// <summary>
     /// Returns all courses with the teaching instructor's name resolved.
-    /// Requires the VIEW_COURSES permission.
+    /// Requires the VIEW_MAJOR permission.
     /// </summary>
     [HttpGet]
     [Authorize(Policy = Permissions.ViewCourses)]
@@ -35,7 +35,7 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Creates a new course. Requires the CREATE_COURSE permission.
+    /// Creates a new course. Requires the CREATE_MAJOR permission.
     /// </summary>
     [HttpPost]
     [Authorize(Policy = Permissions.CreateCourse)]
@@ -56,7 +56,7 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Deletes a course by ID. Requires the DELETE_COURSE permission.
+    /// Deletes a course by ID. Requires the DELETE_MAJOR permission.
     /// </summary>
     [HttpDelete("{id:int}")]
     [Authorize(Policy = Permissions.DeleteCourse)]

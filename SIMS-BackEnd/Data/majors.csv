@@ -1,0 +1,4 @@
+Id, MajorCode, Name                  , Description                                                           , Department            , TotalCredits, IsActive, CreatedAt                   , UpdatedAt
+ 1, IT       , Information Technology, "Core IT skills covering programming, databases, and systems"         , Information Technology,          120, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+ 2, SE       , Software Engineering  , "Systematic approach to software design, development, and maintenance", Information Technology,          130, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+ 3, CS       , Computer Science      , Theoretical foundations and practical applications of computing       , Information Technology,          125, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
