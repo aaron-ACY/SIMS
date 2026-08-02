@@ -67,6 +67,14 @@ public sealed class ErrorCode
     public static readonly ErrorCode COURSE_CODE_EXISTED =
         new(1016, "Course code existed", HttpStatusCode.BadRequest);
 
+    // ── Major ─────────────────────────────────────────────────────────── //
+
+    public static readonly ErrorCode MAJOR_NOT_EXISTED =
+        new(1042, "Major not existed", HttpStatusCode.NotFound);
+
+    public static readonly ErrorCode MAJOR_CODE_EXISTED =
+        new(1043, "Major code existed", HttpStatusCode.BadRequest);
+
     public static readonly ErrorCode INSTRUCTOR_NOT_EXISTED =
         new(1017, "Instructor not existed", HttpStatusCode.NotFound);
 
