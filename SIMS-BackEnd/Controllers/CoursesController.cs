@@ -8,7 +8,7 @@ using SIMS.Shared.Models;
 namespace SIMS_BackEnd.Controllers;
 
 [ApiController]
-[Route("api/majors")]
+[Route("api/courses")]
 [Authorize]
 public class CoursesController : ControllerBase
 {
@@ -20,22 +20,21 @@ public class CoursesController : ControllerBase
     }
 
     /// <summary>
-    /// Returns all courses with the teaching instructor's name resolved.
-    /// Requires the VIEW_MAJOR permission.
+    /// Returns the full list of courses (môn học). Requires the VIEW_COURSES permission.
     /// </summary>
     [HttpGet]
     [Authorize(Policy = Permissions.ViewCourses)]
     [ProducesResponseType(typeof(ApiResponse<IEnumerable<CourseResponse>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetAllCourses(CancellationToken ct)
+    public async Task<IActionResult> GetCourses(CancellationToken ct)
     {
         var courses = await _courseService.GetAllAsync(ct);
-        return Ok(ApiResponse<IEnumerable<CourseResponse>>.Ok(courses));
+        return Ok(ApiResponse<IEnumerable<CourseResponse>>.Ok(courses, "Courses retrieved successfully."));
     }
 
     /// <summary>
-    /// Creates a new course. Requires the CREATE_MAJOR permission.
+    /// Creates a new course (môn học). Requires the CREATE_COURSE permission.
     /// </summary>
     [HttpPost]
     [Authorize(Policy = Permissions.CreateCourse)]
@@ -48,15 +47,13 @@ public class CoursesController : ControllerBase
     {
         var course = await _courseService.CreateAsync(request, ct);
 
-        // No GET /api/courses/{id} endpoint exists to serve as the Location target,
-        // so a bare 201 is returned instead of a Location header pointing nowhere.
         return StatusCode(
             StatusCodes.Status201Created,
             ApiResponse<CourseResponse>.Ok(course, "Course created successfully."));
     }
 
     /// <summary>
-    /// Deletes a course by ID. Requires the DELETE_MAJOR permission.
+    /// Deletes a course by ID. Requires the DELETE_COURSE permission.
     /// </summary>
     [HttpDelete("{id:int}")]
     [Authorize(Policy = Permissions.DeleteCourse)]

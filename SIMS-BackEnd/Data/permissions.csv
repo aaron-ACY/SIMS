@@ -32,3 +32,6 @@ Id, Name              , Description
 32, EDIT_INSTRUCTOR   , Edit instructor records
 33, DELETE_INSTRUCTOR , Delete instructor records
 34, SUBMITTED         , Submit an assignment file for an enrollment
+35, VIEW_COURSES      , View course list
+36, CREATE_COURSE     , Create new course
+37, DELETE_COURSE     , Delete course records
