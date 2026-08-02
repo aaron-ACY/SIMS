@@ -31,6 +31,38 @@ var builder = WebApplication.CreateBuilder(args);
 // ── Infrastructure + Application services ─────────────────────────── //
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment.ContentRootPath);
 
+// ── CORS ───────────────────────────────────────────────────────────── //
+// Origins are read from Cors:AllowedOrigins in appsettings.
+// Development: appsettings.Development.json lists localhost ports.
+// Production: set Cors__AllowedOrigins__0, __1, ... environment variables
+//             or override via appsettings.Production.json.
+// An empty array blocks all cross-origin requests (safe default for prod).
+const string CorsPolicyName = "SIMSCorsPolicy";
+
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>() ?? [];
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(CorsPolicyName, policy =>
+    {
+        if (allowedOrigins.Length > 0)
+        {
+            policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();  
+        }
+        else
+        {
+            // No origins configured — deny all cross-origin requests.
+            policy.SetIsOriginAllowed(_ => false);
+        }
+    });
+});
+
 // ── JWT Authentication ─────────────────────────────────────────────── //
 var jwtSettings = builder.Configuration
     .GetSection(JwtSettings.SectionName)
@@ -235,6 +267,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(CorsPolicyName); // after HTTPS redirect, before rate-limiting and auth
 app.UseRateLimiter();   // before auth so limits apply regardless of token state
 app.UseAuthentication();
 app.UseAuthorization();
