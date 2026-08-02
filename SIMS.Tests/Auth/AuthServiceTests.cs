@@ -15,6 +15,8 @@ public class AuthServiceTests
     // ── Mocks ──────────────────────────────────────────────────────────── //
 
     private readonly Mock<IUserRepository>          _userRepo          = new();
+    private readonly Mock<IStudentRepository>       _studentRepo       = new();
+    private readonly Mock<IInstructorRepository>    _instructorRepo    = new();
     private readonly Mock<IRoleRepository>          _roleRepo          = new();
     private readonly Mock<IPermissionRepository>    _permRepo          = new();
     private readonly Mock<IPasswordHasher>          _hasher            = new();
@@ -23,6 +25,8 @@ public class AuthServiceTests
 
     private AuthService BuildService() =>
         new(_userRepo.Object,
+            _studentRepo.Object,
+            _instructorRepo.Object,
             _roleRepo.Object,
             _permRepo.Object,
             _hasher.Object,
