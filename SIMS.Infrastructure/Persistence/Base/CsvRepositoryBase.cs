@@ -28,7 +28,8 @@ public abstract class CsvRepositoryBase<T> where T : class
     private static readonly CsvConfiguration CsvConfig = new(CultureInfo.InvariantCulture)
     {
         HasHeaderRecord = true,
-        MissingFieldFound = null,   // tolerate columns added in future migrations
+        MissingFieldFound = null,   // tolerate missing field values within a row
+        HeaderValidated   = null,   // tolerate entity properties not present as CSV columns
 
         // The seed CSV files are hand-aligned with padding spaces for readability
         // ("Id, Username  , Email  ..."). CsvHelper does not trim by default, so
