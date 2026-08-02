@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace SIMS.Application.DTOs.Grades;
 
 /// <summary>
-/// Payload for POST /api/grades. Requires the CREATE_GRADE permission.
+/// Payload for POST /api/grades. Requires the ENTER_GRADE permission.
 /// </summary>
 public class CreateGradeRequest
 {

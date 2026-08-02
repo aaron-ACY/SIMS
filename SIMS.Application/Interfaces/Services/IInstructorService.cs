@@ -21,4 +21,11 @@ public interface IInstructorService
     /// is still assigned to active classes.
     /// </summary>
     Task DeleteAsync(int id, CancellationToken ct = default);
+
+    /// <summary>
+    /// Bulk-imports instructor profiles from a CSV stream.
+    /// Expected columns (no header required): InstructorCode, FirstName, LastName,
+    /// DateOfBirth, Gender, Phone, City, Country, Email, Department, Degree.
+    /// </summary>
+    Task<ImportInstructorsResponse> ImportAsync(Stream csvStream, CancellationToken ct = default);
 }

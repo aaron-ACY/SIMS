@@ -14,11 +14,6 @@ public class UpdateInstructorRequest
     [StringLength(50, ErrorMessage = "Degree must not exceed 50 characters")]
     public string? Degree { get; set; }
 
-    [StringLength(100, ErrorMessage = "Specialization must not exceed 100 characters")]
-    public string? Specialization { get; set; }
-
-    public DateTime? HireDate { get; set; }
-
     [Phone(ErrorMessage = "Invalid phone number format")]
     public string? Phone { get; set; }
 }

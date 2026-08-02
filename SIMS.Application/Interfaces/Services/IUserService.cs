@@ -26,6 +26,18 @@ public interface IUserService
     Task<UserProfileResponse> UpdateMyInfoAsync(int userId, UpdateMyInfoRequest request, CancellationToken ct = default);
 
     /// <summary>
+    /// Creates a user account (role = Student) together with the student profile
+    /// in a single operation. Requires the CREATE_USER permission.
+    /// </summary>
+    Task<UserProfileResponse> CreateStudentUserAsync(CreateStudentUserRequest request, CancellationToken ct = default);
+
+    /// <summary>
+    /// Creates a user account (role = Instructor) together with the instructor profile
+    /// in a single operation. Requires the CREATE_USER permission.
+    /// </summary>
+    Task<UserProfileResponse> CreateInstructorUserAsync(CreateInstructorUserRequest request, CancellationToken ct = default);
+
+    /// <summary>
     /// Deletes a user account. Requires the DELETE_USER permission.
     /// </summary>
     /// <param name="userId">The account to delete.</param>

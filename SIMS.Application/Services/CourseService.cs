@@ -33,7 +33,7 @@ public class CourseService : ICourseService
         var userMap = users.ToDictionary(u => u.Id);
         var instructorNameMap = instructors.ToDictionary(
             i => i.Id,
-            i => userMap.TryGetValue(i.UserId, out var u) ? u.FullName : string.Empty);
+            i => i.UserId.HasValue && userMap.TryGetValue(i.UserId.Value, out var u) ? u.FullName : string.Empty);
 
         return courses.Select(c => MapToResponse(
             c,
@@ -68,7 +68,7 @@ public class CourseService : ICourseService
         // AddAsync assigns Id, CreatedAt and UpdatedAt.
         await _courseRepository.AddAsync(course);
 
-        var user = await _userRepository.GetByIdAsync(instructor.UserId);
+        var user = await _userRepository.GetByIdAsync(instructor.UserId ?? 0);
         return MapToResponse(course, user?.FullName ?? string.Empty);
     }
 

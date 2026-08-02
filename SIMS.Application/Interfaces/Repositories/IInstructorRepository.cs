@@ -13,6 +13,9 @@ public interface IInstructorRepository
     /// <summary>Returns the instructor record with the given code (case-insensitive), or null when not found.</summary>
     Task<Instructor?> GetByInstructorCodeAsync(string instructorCode);
 
+    /// <summary>Returns the instructor profile whose Email matches (case-insensitive), or null when not found.</summary>
+    Task<Instructor?> GetByEmailAsync(string email);
+
     Task AddAsync(Instructor instructor);
 
     /// <summary>Persists changes to an existing instructor. Returns false when not found.</summary>

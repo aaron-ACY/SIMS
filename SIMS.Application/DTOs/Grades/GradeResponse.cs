@@ -17,6 +17,14 @@ public class GradeResponse
 
     public double Score          { get; set; }
     public string Classification { get; set; } = string.Empty;
-    public DateTime GradedAt     { get; set; }
-    public DateTime UpdatedAt    { get; set; }
+
+    /// <summary>
+    /// Relative path to the submitted file inside Data/files/.
+    /// Null until the student submits.
+    /// </summary>
+    public string? SubmissionPath { get; set; }
+
+    /// <summary>Null until an instructor formally enters a score.</summary>
+    public DateTime? GradedAt    { get; set; }
+    public DateTime  UpdatedAt   { get; set; }
 }

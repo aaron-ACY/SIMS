@@ -93,6 +93,126 @@ public class UserService : IUserService
             instructorCode: null));
     }
 
+    public async Task<UserProfileResponse> CreateStudentUserAsync(CreateStudentUserRequest request, CancellationToken ct = default)
+    {
+        var username = request.Username.Trim().ToLowerInvariant();
+        var email    = request.Email.Trim().ToLowerInvariant();
+
+        if (username.Length < MinUsernameLength)
+            throw new AppException(ErrorCode.USERNAME_INVALID);
+
+        if (request.Password.Length < MinPasswordLength)
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+
+        if (await _userRepository.GetByUsernameAsync(username) is not null)
+            throw new AppException(ErrorCode.USER_EXISTED);
+
+        if (await _userRepository.GetByEmailAsync(email) is not null)
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+
+        var role = await _roleRepository.GetByNameAsync(Roles.Student)
+                   ?? throw new AppException(ErrorCode.ROLE_NOT_EXISTED);
+
+        var (hash, salt) = _passwordHasher.HashPassword(request.Password);
+
+        var user = new User
+        {
+            Username     = username,
+            Email        = email,
+            PasswordHash = hash,
+            Salt         = salt,
+            FirstName    = request.FirstName.Trim(),
+            LastName     = request.LastName.Trim(),
+            RoleId       = role.Id,
+            IsActive     = true
+        };
+        await _userRepository.AddAsync(user);
+
+        // Auto-generate a unique student code: BD + 5-digit zero-padded sequence.
+        var allStudents = await _studentRepository.GetAllAsync();
+        var studentCode = GenerateStudentCode(allStudents);
+
+        var student = new Student
+        {
+            UserId         = user.Id,
+            StudentCode    = studentCode,
+            FirstName      = user.FirstName,
+            LastName       = user.LastName,
+            Email          = email,
+            DateOfBirth    = request.DateOfBirth,
+            Gender         = request.Gender.Trim(),
+            Phone          = request.Phone.Trim(),
+            Address        = request.Address.Trim(),
+            Major          = request.Major.Trim(),
+            EnrollmentYear = request.EnrollmentYear,
+            Status         = request.Status.Trim(),
+            IsActive       = true
+        };
+        await _studentRepository.AddAsync(student);
+
+        var permissions = await _permissionRepository.GetByRoleIdAsync(role.Id);
+        return MapToProfile(user, role.Name, permissions.Select(p => p.Name),
+            studentCode: student.StudentCode, instructorCode: null);
+    }
+
+    public async Task<UserProfileResponse> CreateInstructorUserAsync(CreateInstructorUserRequest request, CancellationToken ct = default)
+    {
+        var username = request.Username.Trim().ToLowerInvariant();
+        var email    = request.Email.Trim().ToLowerInvariant();
+
+        if (username.Length < MinUsernameLength)
+            throw new AppException(ErrorCode.USERNAME_INVALID);
+
+        if (request.Password.Length < MinPasswordLength)
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+
+        if (await _userRepository.GetByUsernameAsync(username) is not null)
+            throw new AppException(ErrorCode.USER_EXISTED);
+
+        if (await _userRepository.GetByEmailAsync(email) is not null)
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+
+        var role = await _roleRepository.GetByNameAsync(Roles.Instructor)
+                   ?? throw new AppException(ErrorCode.ROLE_NOT_EXISTED);
+
+        var (hash, salt) = _passwordHasher.HashPassword(request.Password);
+
+        var user = new User
+        {
+            Username     = username,
+            Email        = email,
+            PasswordHash = hash,
+            Salt         = salt,
+            FirstName    = request.FirstName.Trim(),
+            LastName     = request.LastName.Trim(),
+            RoleId       = role.Id,
+            IsActive     = true
+        };
+        await _userRepository.AddAsync(user);
+
+        // Auto-generate a unique instructor code: GV + 5-digit zero-padded sequence.
+        var allInstructors = await _instructorRepository.GetAllAsync();
+        var instructorCode = GenerateInstructorCode(allInstructors);
+
+        var instructor = new Instructor
+        {
+            UserId         = user.Id,
+            InstructorCode = instructorCode,
+            FirstName      = user.FirstName,
+            LastName       = user.LastName,
+            Email          = email,
+            Department     = request.Department.Trim(),
+            Degree         = request.Degree.Trim(),
+            Phone          = request.Phone.Trim(),
+            IsActive       = true
+        };
+        await _instructorRepository.AddAsync(instructor);
+
+        var permissions = await _permissionRepository.GetByRoleIdAsync(role.Id);
+        return MapToProfile(user, role.Name, permissions.Select(p => p.Name),
+            studentCode: null, instructorCode: instructor.InstructorCode);
+    }
+
     public async Task<UserProfileResponse> CreateAsync(CreateUserRequest request, CancellationToken ct = default)
     {
         var username = request.Username.Trim().ToLowerInvariant();
@@ -110,7 +230,7 @@ public class UserService : IUserService
         if (await _userRepository.GetByEmailAsync(email) is not null)
             throw new AppException(ErrorCode.EMAIL_EXISTED);
 
-        var role = await _roleRepository.GetByIdAsync(request.RoleId)
+        var role = await _roleRepository.GetByNameAsync(request.RoleName.Trim())
                    ?? throw new AppException(ErrorCode.ROLE_NOT_EXISTED);
 
         var (hash, salt) = _passwordHasher.HashPassword(request.Password);
@@ -205,6 +325,40 @@ public class UserService : IUserService
     }
 
     // ------------------------------------------------------------------ //
+
+    // ── Code generation helpers ────────────────────────────────────────── //
+
+    /// <summary>
+    /// Returns the next available student code in BD00001 format.
+    /// Parses the numeric suffix of all existing BD-prefixed codes and
+    /// returns max + 1 zero-padded to 5 digits.
+    /// </summary>
+    private static string GenerateStudentCode(IEnumerable<Student> students)
+    {
+        var max = students
+            .Select(s => s.StudentCode)
+            .Where(c => c.StartsWith("BD", StringComparison.OrdinalIgnoreCase) && c.Length > 2)
+            .Select(c => int.TryParse(c[2..], out var n) ? n : 0)
+            .DefaultIfEmpty(0)
+            .Max();
+        return $"BD{max + 1:D5}";
+    }
+
+    /// <summary>
+    /// Returns the next available instructor code in GV00001 format.
+    /// Parses the numeric suffix of all existing GV-prefixed codes and
+    /// returns max + 1 zero-padded to 5 digits.
+    /// </summary>
+    private static string GenerateInstructorCode(IEnumerable<Instructor> instructors)
+    {
+        var max = instructors
+            .Select(i => i.InstructorCode)
+            .Where(c => c.StartsWith("GV", StringComparison.OrdinalIgnoreCase) && c.Length > 2)
+            .Select(c => int.TryParse(c[2..], out var n) ? n : 0)
+            .DefaultIfEmpty(0)
+            .Max();
+        return $"GV{max + 1:D5}";
+    }
 
     private static UserProfileResponse MapToProfile(
         Domain.Entities.User user,

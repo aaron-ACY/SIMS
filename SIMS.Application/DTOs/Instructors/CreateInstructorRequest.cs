@@ -20,13 +20,6 @@ public class CreateInstructorRequest
     [StringLength(50, ErrorMessage = "Degree must not exceed 50 characters")]
     public string Degree { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Specialization is required")]
-    [StringLength(100, ErrorMessage = "Specialization must not exceed 100 characters")]
-    public string Specialization { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "Hire date is required")]
-    public DateTime HireDate { get; set; }
-
     [Required(ErrorMessage = "Phone is required")]
     [Phone(ErrorMessage = "Invalid phone number format")]
     public string Phone { get; set; } = string.Empty;

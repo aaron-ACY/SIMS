@@ -23,7 +23,7 @@ public class CreateUserRequest
     [Required(ErrorMessage = "LastName is required.")]
     public string LastName { get; set; } = string.Empty;
 
-    /// <summary>Role to assign: 1 = Admin, 2 = Instructor, 3 = Student.</summary>
-    [Required(ErrorMessage = "RoleId is required.")]
-    public int RoleId { get; set; }
+    /// <summary>Role name: "Admin", "Instructor" or "Student".</summary>
+    [Required(ErrorMessage = "RoleName is required.")]
+    public string RoleName { get; set; } = string.Empty;
 }

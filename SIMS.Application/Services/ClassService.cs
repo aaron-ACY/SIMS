@@ -51,7 +51,7 @@ public class ClassService : IClassService
         {
             subjectMap.TryGetValue(c.SubjectId, out var subjectName);
             instructorMap.TryGetValue(c.InstructorId, out var instructor);
-            var instructorName = instructor is not null && userMap.TryGetValue(instructor.UserId, out var n)
+            var instructorName = instructor is not null && instructor.UserId.HasValue && userMap.TryGetValue(instructor.UserId.Value, out var n)
                 ? n : string.Empty;
 
             return new ClassListItemResponse
@@ -140,7 +140,7 @@ public class ClassService : IClassService
         // AddAsync assigns Id, CreatedAt and UpdatedAt.
         await _classRepository.AddAsync(schoolClass);
 
-        var user = await _userRepository.GetByIdAsync(instructor.UserId);
+        var user = await _userRepository.GetByIdAsync(instructor.UserId ?? 0);
         return MapToResponse(schoolClass, subject.Name, user?.FullName ?? string.Empty);
     }
 

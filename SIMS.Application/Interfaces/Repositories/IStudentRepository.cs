@@ -13,6 +13,9 @@ public interface IStudentRepository
     /// <summary>Returns the student record with the given student code, or null when not found.</summary>
     Task<Student?> GetByStudentCodeAsync(string studentCode);
 
+    /// <summary>Returns the student profile whose Email matches (case-insensitive), or null when not found.</summary>
+    Task<Student?> GetByEmailAsync(string email);
+
     Task AddAsync(Student student);
     Task UpdateAsync(Student student);
     Task<bool> DeleteAsync(int id);

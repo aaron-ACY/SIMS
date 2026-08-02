@@ -31,28 +31,62 @@ public class GradeService : IGradeService
         _userRepository       = userRepository;
     }
 
+    public async Task<GradeResponse> SubmitAsync(int enrollmentId, string submissionPath, CancellationToken ct = default)
+    {
+        // Verify the enrollment exists.
+        var enrollment = await _enrollmentRepository.GetByIdAsync(enrollmentId)
+                         ?? throw new AppException(ErrorCode.ENROLLMENT_NOT_EXISTED);
+
+        var existing = await _gradeRepository.GetByEnrollmentIdAsync(enrollmentId);
+
+        Grade grade;
+        if (existing is null)
+        {
+            // First submission — create the grade record without a score yet.
+            grade = new Grade
+            {
+                EnrollmentId   = enrollment.Id,
+                StudentId      = enrollment.StudentId,
+                ClassId        = enrollment.ClassId,
+                SubmissionPath = submissionPath,
+                UpdatedAt      = DateTime.UtcNow
+            };
+            await _gradeRepository.AddAsync(grade);
+        }
+        else
+        {
+            // Re-submission — overwrite the path; preserve any existing score.
+            existing.SubmissionPath = submissionPath;
+            existing.UpdatedAt      = DateTime.UtcNow;
+            await _gradeRepository.UpdateAsync(existing);
+            grade = existing;
+        }
+
+        return await BuildResponseAsync(grade);
+    }
+
     public async Task<GradeResponse> CreateAsync(CreateGradeRequest request, CancellationToken ct = default)
     {
         // Verify the enrollment exists.
         var enrollment = await _enrollmentRepository.GetByIdAsync(request.EnrollmentId)
                          ?? throw new AppException(ErrorCode.ENROLLMENT_NOT_EXISTED);
 
-        // Prevent duplicate grade for the same enrollment.
-        if (await _gradeRepository.GetByEnrollmentIdAsync(enrollment.Id) is not null)
+        // A grade can only be entered after the student has submitted their assignment.
+        var grade = await _gradeRepository.GetByEnrollmentIdAsync(enrollment.Id);
+
+        if (grade is null || grade.SubmissionPath is null)
+            throw new AppException(ErrorCode.SUBMISSION_NOT_FOUND);
+
+        // Prevent entering a grade twice for the same enrollment.
+        if (grade.GradedAt is not null)
             throw new AppException(ErrorCode.GRADE_ALREADY_EXISTS);
 
-        var grade = new Grade
-        {
-            EnrollmentId   = enrollment.Id,
-            StudentId      = enrollment.StudentId,
-            ClassId        = enrollment.ClassId,
-            Score          = request.Score,
-            Classification = Classify(request.Score),
-            GradedAt       = DateTime.UtcNow,
-            UpdatedAt      = DateTime.UtcNow
-        };
+        grade.Score          = request.Score;
+        grade.Classification = Classify(request.Score);
+        grade.GradedAt       = DateTime.UtcNow;
+        grade.UpdatedAt      = DateTime.UtcNow;
 
-        await _gradeRepository.AddAsync(grade);
+        await _gradeRepository.UpdateAsync(grade);
 
         return await BuildResponseAsync(grade);
     }
@@ -61,6 +95,10 @@ public class GradeService : IGradeService
     {
         var grade = await _gradeRepository.GetByIdAsync(gradeId)
                     ?? throw new AppException(ErrorCode.GRADE_NOT_EXISTED);
+
+        // Can only edit a grade that has already been formally entered.
+        if (grade.GradedAt is null)
+            throw new AppException(ErrorCode.GRADE_NOT_YET_ENTERED);
 
         grade.Score          = request.Score;
         grade.Classification = Classify(request.Score);
@@ -76,7 +114,7 @@ public class GradeService : IGradeService
         var student = await _studentRepository.GetByStudentCodeAsync(studentCode)
                       ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
 
-        var user = await _userRepository.GetByIdAsync(student.UserId);
+        var user = await _userRepository.GetByIdAsync(student.UserId ?? 0);
 
         var grades = (await _gradeRepository.GetByStudentIdAsync(student.Id))
                      .OrderByDescending(g => g.GradedAt)
@@ -154,7 +192,7 @@ public class GradeService : IGradeService
         string studentName = string.Empty;
         if (student is not null)
         {
-            var user = await _userRepository.GetByIdAsync(student.UserId);
+            var user = await _userRepository.GetByIdAsync(student.UserId ?? 0);
             studentName = user?.FullName ?? string.Empty;
         }
 
@@ -168,6 +206,7 @@ public class GradeService : IGradeService
             ClassCode      = schoolClass?.ClassCode ?? string.Empty,
             Score          = grade.Score,
             Classification = grade.Classification,
+            SubmissionPath = grade.SubmissionPath,
             GradedAt       = grade.GradedAt,
             UpdatedAt      = grade.UpdatedAt
         };
