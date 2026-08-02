@@ -56,6 +56,7 @@ public class ClassService : IClassService
 
             return new ClassListItemResponse
             {
+                Id                = c.Id,
                 ClassCode         = c.ClassCode,
                 SubjectName       = subjectName ?? string.Empty,
                 InstructorName    = instructorName,

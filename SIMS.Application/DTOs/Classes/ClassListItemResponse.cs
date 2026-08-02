@@ -5,6 +5,7 @@ namespace SIMS.Application.DTOs.Classes;
 /// </summary>
 public class ClassListItemResponse
 {
+    public int    Id                { get; set; }
     public string ClassCode         { get; set; } = string.Empty;
     public string SubjectName       { get; set; } = string.Empty;
     public string InstructorName    { get; set; } = string.Empty;
