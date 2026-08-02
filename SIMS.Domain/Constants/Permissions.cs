@@ -27,10 +27,15 @@ public static class Permissions
     public const string DeleteInstructor   = "DELETE_INSTRUCTOR";
     public const string ImportInstructors  = "IMPORT_INSTRUCTORS";
 
-    // ── Major ─────────────────────────────────────────────────────────── //
-    public const string ViewCourses  = "VIEW_MAJOR";
-    public const string CreateCourse = "CREATE_MAJOR";
-    public const string DeleteCourse = "DELETE_MAJOR";
+    // ── Majors (Chuyên ngành) ─────────────────────────────────────────── //
+    public const string ViewMajors  = "VIEW_MAJOR";
+    public const string CreateMajor = "CREATE_MAJOR";
+    public const string DeleteMajor = "DELETE_MAJOR";
+
+    // ── Courses (Môn học) ─────────────────────────────────────────────── //
+    public const string ViewCourses  = "VIEW_COURSES";
+    public const string CreateCourse = "CREATE_COURSE";
+    public const string DeleteCourse = "DELETE_COURSE";
 
     // ── Subjects ──────────────────────────────────────────────────────── //
     public const string ViewSubject   = "VIEW_SUB";
@@ -86,6 +91,9 @@ public static class Permissions
         EditInstructor,
         DeleteInstructor,
         ImportInstructors,
+        ViewMajors,
+        CreateMajor,
+        DeleteMajor,
         ViewCourses,
         CreateCourse,
         DeleteCourse,
