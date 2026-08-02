@@ -65,6 +65,7 @@ public static class DependencyInjection
 
         services.AddSingleton<IStudentRepository,       StudentRepository>();
         services.AddSingleton<IInstructorRepository,    InstructorRepository>();
+        services.AddSingleton<IMajorRepository,         MajorRepository>();
         services.AddSingleton<ICourseRepository,        CourseRepository>();
         services.AddSingleton<ISubjectRepository,       SubjectRepository>();
         services.AddSingleton<IClassRepository,         ClassRepository>();
@@ -85,7 +86,8 @@ public static class DependencyInjection
         services.AddScoped<IUserService,       UserService>();
         services.AddScoped<IStudentService,    StudentService>();
         services.AddScoped<IInstructorService, InstructorService>();
-        services.AddScoped<ICourseService,     CourseService>();
+        services.AddScoped<IMajorService,     MajorService>();
+        services.AddScoped<ICourseService,    CourseService>();
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped<ISubjectService,    SubjectService>();
         services.AddScoped<IClassService,      ClassService>();
