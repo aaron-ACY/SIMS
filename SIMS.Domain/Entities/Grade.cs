@@ -23,6 +23,16 @@ public class Grade
     /// </summary>
     public string Classification { get; set; } = string.Empty;
 
-    public DateTime GradedAt   { get; set; }
-    public DateTime UpdatedAt  { get; set; }
+    /// <summary>
+    /// Relative path to the submitted assignment file inside Data/files/.
+    /// Null until the student submits via POST /api/grades/{enrollmentId}/submit.
+    /// </summary>
+    public string? SubmissionPath { get; set; }
+
+    /// <summary>
+    /// Set when an instructor formally enters a score. Null until graded,
+    /// which means ENTER_GRADE has not yet been called for this enrollment.
+    /// </summary>
+    public DateTime? GradedAt  { get; set; }
+    public DateTime  UpdatedAt { get; set; }
 }

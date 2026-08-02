@@ -14,21 +14,23 @@ public static class Permissions
     public const string DeleteUser   = "DELETE_USER";
 
     // ── Students ──────────────────────────────────────────────────────── //
-    public const string ViewStudents   = "VIEW_STUDENTS";
-    public const string CreateStudent  = "CREATE_STUDENT";
-    public const string EditStudent    = "EDIT_STUDENT";
-    public const string DeleteStudent  = "DELETE_STUDENT";
+    public const string ViewStudents    = "VIEW_STUDENTS";
+    public const string CreateStudent   = "CREATE_STUDENT";
+    public const string EditStudent     = "EDIT_STUDENT";
+    public const string DeleteStudent   = "DELETE_STUDENT";
+    public const string ImportStudents  = "IMPORT_STUDENTS";
 
     // ── Instructors ───────────────────────────────────────────────────── //
-    public const string ViewInstructors   = "VIEW_INSTRUCTORS";
-    public const string CreateInstructor  = "CREATE_INSTRUCTOR";
-    public const string EditInstructor    = "EDIT_INSTRUCTOR";
-    public const string DeleteInstructor  = "DELETE_INSTRUCTOR";
+    public const string ViewInstructors    = "VIEW_INSTRUCTORS";
+    public const string CreateInstructor   = "CREATE_INSTRUCTOR";
+    public const string EditInstructor     = "EDIT_INSTRUCTOR";
+    public const string DeleteInstructor   = "DELETE_INSTRUCTOR";
+    public const string ImportInstructors  = "IMPORT_INSTRUCTORS";
 
-    // ── Courses ───────────────────────────────────────────────────────── //
-    public const string ViewCourses  = "VIEW_COURSES";
-    public const string CreateCourse = "CREATE_COURSE";
-    public const string DeleteCourse = "DELETE_COURSE";
+    // ── Major ─────────────────────────────────────────────────────────── //
+    public const string ViewCourses  = "VIEW_MAJOR";
+    public const string CreateCourse = "CREATE_MAJOR";
+    public const string DeleteCourse = "DELETE_MAJOR";
 
     // ── Subjects ──────────────────────────────────────────────────────── //
     public const string ViewSubject   = "VIEW_SUB";
@@ -43,9 +45,15 @@ public static class Permissions
     public const string GetOut                = "GETOUT";
 
     // ── Grades ────────────────────────────────────────────────────────── //
-    public const string CreateGrade = "CREATE_GRADE";
+    public const string EnterGrade  = "ENTER_GRADE";
     public const string EditGrade   = "EDIT_GRADE";
     public const string ViewScore   = "VIEW_SCORE";
+
+    /// <summary>
+    /// Allows a student to submit an assignment file for an enrollment.
+    /// Must be held before an instructor can enter a grade.
+    /// </summary>
+    public const string Submitted   = "SUBMITTED";
 
     // ── Permissions management ────────────────────────────────────────── //
     public const string ViewPermissions  = "VIEW_PERMISSIONS";
@@ -72,10 +80,12 @@ public static class Permissions
         CreateStudent,
         EditStudent,
         DeleteStudent,
+        ImportStudents,
         ViewInstructors,
         CreateInstructor,
         EditInstructor,
         DeleteInstructor,
+        ImportInstructors,
         ViewCourses,
         CreateCourse,
         DeleteCourse,
@@ -91,9 +101,10 @@ public static class Permissions
         CreateClass,
         Enrollments,
         GetOut,
-        CreateGrade,
+        EnterGrade,
         EditGrade,
         ViewScore,
+        Submitted,
         EditProfile
     ];
 }
