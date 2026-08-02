@@ -106,6 +106,25 @@ public sealed class ErrorCode
     public static readonly ErrorCode STUDENT_CODE_EXISTED =
         new(1032, "Student code already exists", HttpStatusCode.BadRequest);
 
+    // ── Registration ──────────────────────────────────────────────────── //
+
+    /// <summary>Email was not found in the students or instructors import list.</summary>
+    public static readonly ErrorCode EMAIL_NOT_REGISTERED =
+        new(1037, "This email is not registered in the system. Please contact an administrator.",
+            HttpStatusCode.UnprocessableEntity);
+
+    /// <summary>A user account is already linked to this profile's email.</summary>
+    public static readonly ErrorCode ACCOUNT_ALREADY_LINKED =
+        new(1038, "An account already exists for this email.",
+            HttpStatusCode.BadRequest);
+
+    // ── CSV Import ────────────────────────────────────────────────────── //
+
+    /// <summary>The uploaded file could not be parsed as a valid CSV.</summary>
+    public static readonly ErrorCode CSV_PARSE_ERROR =
+        new(1039, "The uploaded file could not be parsed. Check that it is a valid CSV.",
+            HttpStatusCode.UnprocessableEntity);
+
     // ── Grade ─────────────────────────────────────────────────────────── //
 
     public static readonly ErrorCode GRADE_NOT_EXISTED =
@@ -114,6 +133,22 @@ public sealed class ErrorCode
     public static readonly ErrorCode GRADE_ALREADY_EXISTS =
         new(1031, "A grade already exists for this student in this class",
             HttpStatusCode.BadRequest);
+
+    /// <summary>
+    /// Raised when an instructor tries to enter a grade but the student
+    /// has not yet submitted an assignment (SubmissionPath is null).
+    /// </summary>
+    public static readonly ErrorCode SUBMISSION_NOT_FOUND =
+        new(1040, "No submission found for this enrollment. The student must submit an assignment before a grade can be entered.",
+            HttpStatusCode.UnprocessableEntity);
+
+    /// <summary>
+    /// Raised when an instructor tries to edit a grade that has never been
+    /// formally entered (GradedAt is null).
+    /// </summary>
+    public static readonly ErrorCode GRADE_NOT_YET_ENTERED =
+        new(1041, "This grade has not been entered yet and cannot be edited.",
+            HttpStatusCode.UnprocessableEntity);
 
     // ── Permission ────────────────────────────────────────────────────── //
 
