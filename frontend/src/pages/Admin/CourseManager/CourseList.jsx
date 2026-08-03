@@ -106,7 +106,7 @@ const CourseList = () => {
               <div className="w-8 h-8 border-4 border-[var(--theme-primary)]/30 border-t-[var(--theme-primary)] rounded-full animate-spin" />
             </div>
           ) : filteredCourses.length > 0 ? (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse bg-white">
               <thead>
                 <tr className="text-[var(--theme-textMuted)] text-xs uppercase tracking-wider border-b border-[var(--theme-border)] bg-[var(--theme-hover)]/30">
                   <th className="py-4 px-6 font-bold">Course Code</th>
@@ -173,19 +173,19 @@ const CourseList = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Course Code *</label>
-              <input type="text" name="courseCode" required value={formData.courseCode} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="courseCode" required value={formData.courseCode} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Course Name *</label>
-              <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1 col-span-2">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Description</label>
-              <input type="text" name="description" value={formData.description} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="description" value={formData.description} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Credits *</label>
-              <input type="number" name="credits" required min={1} max={10} value={formData.credits} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="number" name="credits" required min={1} max={10} value={formData.credits} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1 flex items-center mt-6">
               <label className="flex items-center gap-2 cursor-pointer">
@@ -218,3 +218,5 @@ const CourseList = () => {
 };
 
 export default CourseList;
+
+

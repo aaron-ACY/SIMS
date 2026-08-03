@@ -105,22 +105,14 @@ const StudentSubmitAssignment = () => {
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      setSelectedFile({
-        name: file.name,
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        type: file.name.split('.').pop()
-      });
+      setSelectedFile(file);
     }
   };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      setSelectedFile({
-        name: file.name,
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        type: file.name.split('.').pop()
-      });
+      setSelectedFile(file);
     }
   };
 
@@ -286,7 +278,11 @@ const StudentSubmitAssignment = () => {
                     <FileText size={20} className="text-[var(--theme-primary)] shrink-0" />
                     <div className="min-w-0">
                       <p className="font-bold text-xs text-[var(--theme-text)] truncate">{selectedFile.name}</p>
-                      <p className="text-[9px] text-[var(--theme-text)]/40 font-black uppercase">{selectedFile.size || 'unknown size'}</p>
+                      <p className="text-[9px] text-[var(--theme-text)]/40 font-black uppercase">
+                        {typeof selectedFile.size === 'number' 
+                          ? `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB` 
+                          : selectedFile.size || 'unknown size'}
+                      </p>
                     </div>
                   </div>
                   {!isGraded && (

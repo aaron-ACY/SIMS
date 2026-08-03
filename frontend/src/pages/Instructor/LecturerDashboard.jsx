@@ -49,9 +49,6 @@ const LecturerDashboard = () => {
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight mb-2">Instructor Dashboard</h2>
           <p className="text-sm font-medium text-white/80">Manage your classes, review schedules, and track assignments grading progress.</p>
         </div>
-        <div className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl text-xs font-bold uppercase tracking-widest border border-white/20">
-          Instructor Account
-        </div>
       </div>
 
       {/* Stats Widgets */}

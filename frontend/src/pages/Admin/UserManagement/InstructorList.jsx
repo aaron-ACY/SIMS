@@ -5,7 +5,8 @@ import {
   Filter, 
   Plus, 
   MoreVertical,
-  Users
+  Users,
+  Trash2
 } from 'lucide-react';
 import PageHeader from '../../../components/Shared/PageHeader';
 import SectionCard from '../../../components/Shared/SectionCard';
@@ -114,7 +115,7 @@ const InstructorList = () => {
                <p className="text-[var(--theme-textMuted)] font-medium">Loading instructors...</p>
             </div>
           ) : instructors.length > 0 ? (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse bg-white">
               <thead>
                 <tr className="bg-[var(--theme-hover)]/50 text-[var(--theme-textMuted)] text-xs uppercase tracking-wider">
                   <th className="py-3 px-4 font-bold">Instructor Code</th>
@@ -153,8 +154,11 @@ const InstructorList = () => {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <button className="p-2 hover:bg-[var(--theme-hover)] rounded-lg transition-colors text-[var(--theme-textMuted)] hover:text-[var(--theme-text)]">
-                        <MoreVertical size={16} />
+                      <button 
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-red-500/70 hover:text-red-600 cursor-pointer"
+                        title="Delete Instructor"
+                      >
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
@@ -182,31 +186,31 @@ const InstructorList = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Username *</label>
-              <input type="text" name="username" required value={formData.username} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="username" required value={formData.username} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Password *</label>
-              <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="password" name="password" required minLength={8} value={formData.password} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1 col-span-2">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Email *</label>
-              <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="email" name="email" required value={formData.email} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">First Name *</label>
-              <input type="text" name="firstName" required value={formData.firstName} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="firstName" required value={formData.firstName} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Last Name *</label>
-              <input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="lastName" required value={formData.lastName} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Department *</label>
-              <input type="text" name="department" required value={formData.department} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="department" required value={formData.department} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Degree *</label>
-              <select name="degree" required value={formData.degree} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]">
+              <select name="degree" required value={formData.degree} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]">
                 <option value="Bachelor">Bachelor</option>
                 <option value="Master">Master</option>
                 <option value="PhD">PhD</option>
@@ -214,7 +218,7 @@ const InstructorList = () => {
             </div>
             <div className="space-y-1 col-span-2">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Phone *</label>
-              <input type="tel" name="phone" required value={formData.phone} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="tel" name="phone" required value={formData.phone} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
           </div>
 
@@ -241,3 +245,5 @@ const InstructorList = () => {
 };
 
 export default InstructorList;
+
+

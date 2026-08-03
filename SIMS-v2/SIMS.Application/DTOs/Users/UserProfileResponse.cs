@@ -43,4 +43,7 @@ public class UserProfileResponse
     // ── Shared optional (Student + Instructor) ──────────────────────────── //
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string?    Phone { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string?    Address { get; set; }
 }

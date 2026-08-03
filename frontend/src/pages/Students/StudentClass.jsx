@@ -54,7 +54,7 @@ const StudentClass = () => {
                <p className="text-[var(--theme-textMuted)] font-medium">Loading classes...</p>
              </div>
           ) : classList.length > 0 ? (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse bg-white">
               <thead>
                 <tr className="bg-[var(--theme-hover)]/30 text-[var(--theme-textMuted)] text-[11px] font-black uppercase tracking-widest border-b border-[var(--theme-border)]">
                   <th className="py-5 px-6">Class ID</th>
@@ -90,3 +90,4 @@ const StudentClass = () => {
 };
 
 export default StudentClass;
+

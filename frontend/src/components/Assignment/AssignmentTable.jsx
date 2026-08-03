@@ -4,7 +4,7 @@ import AssignmentRow from './AssignmentRow';
 const AssignmentTable = ({ submissions, onGradeClick }) => {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
+      <table className="w-full text-left border-collapse bg-white">
         <thead>
           <tr className="bg-[var(--theme-hover)]/30 text-[var(--theme-textMuted)] text-xs uppercase tracking-wider border-b border-[var(--theme-border)]">
             <th className="py-4 px-6 font-bold">Student Code</th>
@@ -31,3 +31,4 @@ const AssignmentTable = ({ submissions, onGradeClick }) => {
 };
 
 export default AssignmentTable;
+

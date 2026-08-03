@@ -121,7 +121,7 @@ const SubjectList = () => {
                <p className="text-[var(--theme-textMuted)] font-medium">Loading subjects...</p>
             </div>
           ) : subjects.length > 0 ? (
-            <table className="w-full text-left border-collapse">
+            <table className="w-full text-left border-collapse bg-white">
               <thead>
                 <tr className="bg-[var(--theme-hover)]/50 text-[var(--theme-textMuted)] text-xs uppercase tracking-wider">
                   <th className="py-3 px-4 font-bold">Subject Code</th>
@@ -172,35 +172,35 @@ const SubjectList = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Subject Code *</label>
-              <input type="text" name="subjectCode" required value={formData.subjectCode} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="subjectCode" required value={formData.subjectCode} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Subject Name *</label>
-              <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="name" required value={formData.name} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1 col-span-2">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Description</label>
-              <input type="text" name="description" value={formData.description} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="description" value={formData.description} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Credits *</label>
-              <input type="number" name="credits" required min={1} max={10} value={formData.credits} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="number" name="credits" required min={1} max={10} value={formData.credits} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Department *</label>
-              <input type="text" name="department" required value={formData.department} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="department" required value={formData.department} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Major *</label>
-              <input type="text" name="major" required value={formData.major} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="major" required value={formData.major} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Academic Year *</label>
-              <input type="text" name="academicYear" required value={formData.academicYear} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <input type="text" name="academicYear" required value={formData.academicYear} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Semester *</label>
-              <select name="semester" required value={formData.semester} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]">
+              <select name="semester" required value={formData.semester} onChange={handleInputChange} className="w-full px-3 py-2 bg-white border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]">
                 <option value={1}>1</option>
                 <option value={2}>2</option>
                 <option value={3}>3</option>
@@ -235,3 +235,5 @@ const SubjectList = () => {
 };
 
 export default SubjectList;
+
+

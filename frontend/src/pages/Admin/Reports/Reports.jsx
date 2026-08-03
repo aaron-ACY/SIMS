@@ -7,15 +7,11 @@ import { FileText } from 'lucide-react';
 const Reports = () => {
   return (
     <div className="p-6">
-      <PageHeader 
-        title="Reports" 
-        description="System analytics and reports" 
-      />
       <SectionCard>
         <EmptyState 
           icon={FileText}
-          title="No report data available."
-          description="Reports will be available once there is sufficient data."
+          title="System under development"
+          description="This feature is currently under development and will be available in future updates."
         />
       </SectionCard>
     </div>

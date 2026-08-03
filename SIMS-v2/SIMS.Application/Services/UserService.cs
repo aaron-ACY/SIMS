@@ -390,6 +390,7 @@ public class UserService : IUserService
         Department     = instructor?.Department,
         Degree         = instructor?.Degree,
         // Shared optional
-        Phone          = student?.Phone ?? instructor?.Phone
+        Phone          = student?.Phone ?? instructor?.Phone,
+        Address        = student?.Address
     };
 }

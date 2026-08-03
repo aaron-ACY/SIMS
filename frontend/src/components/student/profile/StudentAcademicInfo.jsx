@@ -7,13 +7,7 @@ const StudentAcademicInfo = ({ data }) => {
     <ProfileCard title="Academic Information" icon={GraduationCap}>
       <div className="space-y-4">
         <InfoRow label="Major" value={data?.major} />
-        <InfoRow label="Department" value={data?.department} />
-        <InfoRow label="Class Code" value={data?.classCode} />
-        <InfoRow label="Cohort" value={data?.cohort} />
         <InfoRow label="GPA" value={data?.gpa ? `${data.gpa} / 4.00` : null} />
-        <InfoRow label="Completed Credits" value={data?.completedCredits} />
-        <InfoRow label="Academic Status" value={data?.academicStatus} />
-        <InfoRow label="Academic Advisor" value={data?.advisor} />
       </div>
     </ProfileCard>
   );

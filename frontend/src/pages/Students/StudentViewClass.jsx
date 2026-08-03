@@ -59,7 +59,7 @@ const StudentViewClass = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse bg-white">
             <thead>
               <tr className="bg-[var(--theme-hover)]/30 text-[var(--theme-text)]/40 text-[11px] font-black uppercase tracking-widest border-b border-[var(--theme-border)]">
                 <th className="py-5 px-6">Student ID</th>
@@ -86,3 +86,4 @@ const StudentViewClass = () => {
 };
 
 export default StudentViewClass;
+

@@ -119,9 +119,6 @@ const StudentDashboard = () => {
             {studentInfo.semester ? `Semester ${studentInfo.semester}` : '--'} | Academic Year {studentInfo.academicYear || '--'}
           </p>
         </div>
-        <div className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-xl text-xs font-bold uppercase tracking-widest border border-white/20">
-          Student Account
-        </div>
       </div>
 
       {/* My Classes Summary */}

@@ -143,7 +143,7 @@ const ViewClass = () => {
 
         {/* Student List */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse bg-white">
             <thead>
               <tr className="text-[var(--theme-text)]/30 text-[10px] font-black uppercase tracking-widest border-b border-[var(--theme-border)] bg-[var(--theme-hover)]/30">
                 <th className="py-5 px-6">Student Code</th>
@@ -186,3 +186,4 @@ const ViewClass = () => {
 };
 
 export default ViewClass;
+

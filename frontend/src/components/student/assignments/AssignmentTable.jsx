@@ -4,7 +4,7 @@ import AssignmentRow from './AssignmentRow';
 const AssignmentTable = ({ assignments, onViewClick }) => {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse">
+      <table className="w-full text-left border-collapse bg-white">
         <thead>
           <tr className="bg-[var(--theme-hover)]/30 text-[var(--theme-textMuted)] text-[11px] font-black uppercase tracking-widest border-b border-[var(--theme-border)]">
             <th className="py-5 px-6">Assignment Title</th>
@@ -30,3 +30,4 @@ const AssignmentTable = ({ assignments, onViewClick }) => {
 };
 
 export default AssignmentTable;
+

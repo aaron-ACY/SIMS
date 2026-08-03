@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit3 } from 'lucide-react';
+import { Edit3, FileCheck } from 'lucide-react';
 
 const AssignmentRow = ({ submission, onGradeClick }) => {
   const getStatusStyle = (status) => {
@@ -40,10 +40,14 @@ const AssignmentRow = ({ submission, onGradeClick }) => {
       <td className="py-4 px-6 text-right">
         <button 
           onClick={onGradeClick}
-          className="p-2 bg-[var(--theme-hover)] hover:bg-[var(--theme-primary)]/10 text-[var(--theme-textMuted)] hover:text-[var(--theme-primary)] rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5"
-          title="Grade"
+          className={`p-2 rounded-lg transition-colors cursor-pointer inline-flex items-center gap-1.5 ${
+            submission.Score !== null 
+              ? 'bg-[var(--theme-hover)] hover:bg-amber-500/10 text-[var(--theme-textMuted)] hover:text-amber-500' 
+              : 'bg-[var(--theme-primary)]/10 hover:bg-[var(--theme-primary)]/20 text-[var(--theme-primary)]'
+          }`}
+          title={submission.Score !== null ? "Edit Grade" : "Enter Grade"}
         >
-          <Edit3 size={16} />
+          {submission.Score !== null ? <Edit3 size={16} /> : <FileCheck size={16} />}
         </button>
       </td>
     </tr>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-import { userService, gradeService } from '../../api/services';
+import { userService, gradeService, studentService } from '../../api/services';
 import AvatarUploader from '../../components/profile/AvatarUploader';
 import AccountInformation from '../../components/profile/AccountInformation';
 import ChangePasswordCard from '../../components/profile/ChangePasswordCard';
@@ -54,6 +54,7 @@ const StudentProfile = () => {
             code: user.studentCode,
             gender: user.gender,
             dob: user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : undefined,
+            address: user.address,
           },
           accountInfo: {
             username: user.username,

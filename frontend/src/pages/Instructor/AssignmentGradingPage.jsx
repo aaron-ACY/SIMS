@@ -83,7 +83,7 @@ const AssignmentGradingPage = () => {
     if (!selectedStudent) return;
     
     try {
-      if (selectedStudent.GradeId) {
+      if (selectedStudent.Score !== null) {
         // Update existing grade
         const res = await gradeService.updateGrade(selectedStudent.GradeId, {
           enrollmentId: selectedStudent.EnrollmentId,
