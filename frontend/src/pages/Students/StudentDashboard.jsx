@@ -6,6 +6,7 @@ import ScheduleCard from '../../components/dashboard/ScheduleCard';
 import AnnouncementCard from '../../components/dashboard/AnnouncementCard';
 import AssignmentSummary from '../../components/student/dashboard/AssignmentSummary';
 import OverviewCard from '../../components/dashboard/OverviewCard';
+import { userService, studentService, gradeService } from '../../api/services';
 
 const StudentDashboard = () => {
   // API States
@@ -28,16 +29,78 @@ const StudentDashboard = () => {
   const [scheduleData, setScheduleData] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
 
-  // Future API Integration
   useEffect(() => {
-    // setIsLoading(true);
-    // fetchStudentDashboard().then(data => {
-    //   setStudentInfo(data.studentInfo);
-    //   setStats(data.stats);
-    //   setAssignments(data.assignments);
-    //   setScheduleData(data.schedule);
-    //   setAnnouncements(data.announcements);
-    // }).finally(() => setIsLoading(false));
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        const userRes = await userService.getMe();
+        if (!userRes.success || !userRes.result?.studentCode) return;
+        const user = userRes.result;
+        
+        setStudentInfo({
+          name: `${user.firstName} ${user.lastName}`.trim(),
+          semester: 1, // Placeholder
+          academicYear: '2026-2027' // Placeholder
+        });
+
+        const [classesRes, gradesRes] = await Promise.all([
+          studentService.getMyClasses(),
+          gradeService.getStudentGrades(user.studentCode)
+        ]);
+
+        const classes = (classesRes.success ? classesRes.result : []) || [];
+        const gradesData = (gradesRes.success && gradesRes.result ? gradesRes.result.classes : []) || [];
+
+        // Calculate GPA
+        let gpa = 0;
+        const allGrades = gradesData.flatMap(c => c.grades);
+        if (allGrades.length > 0) {
+          const sum = allGrades.reduce((acc, curr) => acc + curr.scores, 0);
+          const avg = sum / allGrades.length;
+          gpa = ((avg / 10) * 4).toFixed(2);
+        }
+
+        setStats({
+          enrolledClasses: classes.length,
+          totalCredits: classes.length * 3, // Assuming 3 credits per class
+          currentGPA: gpa
+        });
+
+        // Format assignments
+        const recentAssignments = classes.map(cls => {
+          let status = 'Pending';
+          const classGradeGroup = gradesData.find(g => g.classCode === cls.classCode);
+          if (classGradeGroup && classGradeGroup.grades && classGradeGroup.grades.length > 0) {
+            status = (classGradeGroup.grades[0].scores > 0 || classGradeGroup.grades[0].rating) ? 'Graded' : 'Submitted';
+          }
+          return {
+            id: cls.enrollmentId,
+            title: `${cls.subjectName} Assignment`,
+            class: cls.classCode,
+            status: status,
+            dueDate: 'End of Semester'
+          };
+        });
+        setAssignments(recentAssignments.slice(0, 5));
+
+        // Format Schedule
+        const sched = classes.map(cls => ({
+          id: cls.classId,
+          title: cls.subjectName,
+          time: cls.schedule || 'TBA',
+          room: cls.room || 'TBA',
+          type: 'Lecture'
+        }));
+        setScheduleData(sched);
+
+      } catch (err) {
+        console.error('Failed to fetch dashboard data', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
   return (

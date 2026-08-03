@@ -28,27 +28,9 @@ const LecturerProfile = () => {
       if (res.success && res.result) {
         const user = res.result;
         
-        let department = 'Contact Admin';
-        let degree = 'Contact Admin';
-        let phone = '';
-
-        if (user.instructorCode) {
-          try {
-            const instRes = await instructorService.getInstructors();
-            if (instRes.success && instRes.result) {
-              const myInstData = instRes.result.find(
-                i => i.instructorCode?.trim() === user.instructorCode?.trim()
-              );
-              if (myInstData) {
-                department = myInstData.department?.trim() || 'Contact Admin';
-                degree = myInstData.degree?.trim() || 'Contact Admin';
-                phone = myInstData.phone?.trim() || '';
-              }
-            }
-          } catch (e) {
-            console.error('Failed to fetch instructor details', e);
-          }
-        }
+        let department = user.department?.trim() || 'Contact Admin';
+        let degree = user.degree?.trim() || 'Contact Admin';
+        let phone = user.phone?.trim() || '';
 
         setProfileData({
           avatarUrl: null,

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { UploadCloud, ArrowLeft, FileText, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { userService, studentService, gradeService } from '../../api/services';
 
 const StudentSubmitAssignment = () => {
   const { id } = useParams();
@@ -13,23 +14,61 @@ const StudentSubmitAssignment = () => {
   const [dragActive, setDragActive] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem('student_assignments');
-    if (stored) {
-      const list = JSON.parse(stored);
-      const found = list.find(item => item.id === id);
-      if (found) {
-        setAssignment(found);
-        
-        // If already submitted or graded, mock the file metadata
-        if (found.status === 'Submitted' || found.status === 'Graded') {
-          setSelectedFile({
-            name: found.id === 'a3' ? 'Midterm_Project.zip' : 'SQL_Queries_Final.docx',
-            size: '2.4 MB',
-            type: found.id === 'a3' ? 'zip' : 'docx'
+    const fetchAssignmentData = async () => {
+      try {
+        const userRes = await userService.getMe();
+        if (!userRes.success || !userRes.result?.studentCode) return;
+        const studentCode = userRes.result.studentCode;
+
+        const [classesRes, gradesRes] = await Promise.all([
+          studentService.getMyClasses(),
+          gradeService.getStudentGrades(studentCode)
+        ]);
+
+        const classes = (classesRes.success ? classesRes.result : []) || [];
+        const gradesData = (gradesRes.success && gradesRes.result ? gradesRes.result.classes : []) || [];
+
+        // Find the specific class matching the enrollment ID
+        const cls = classes.find(c => String(c.enrollmentId) === String(id) || String(c.classId) === String(id));
+        if (cls) {
+          let score = null;
+          let status = 'Pending';
+          let rating = '';
+          
+          const classGradeGroup = gradesData.find(g => g.classCode === cls.classCode);
+          if (classGradeGroup && classGradeGroup.grades && classGradeGroup.grades.length > 0) {
+            score = classGradeGroup.grades[0].scores;
+            rating = classGradeGroup.grades[0].rating;
+            if (score > 0 || rating) {
+              status = 'Graded';
+            } else {
+              status = 'Submitted';
+            }
+          }
+
+          setAssignment({
+            id: cls.enrollmentId,
+            title: `${cls.subjectName} Assignment`,
+            subject: cls.subjectName,
+            status: status,
+            grade: score !== null ? `${score}/10` : '--', // assuming /10 scale based on 85/100 -> actually SIMS uses 10 point scale
+            rating: rating
           });
+
+          if (status === 'Submitted' || status === 'Graded') {
+             // Mock file selection since backend doesn't return file info
+             setSelectedFile({
+               name: 'submitted_assignment.pdf',
+               size: '1.2 MB',
+               type: 'pdf'
+             });
+          }
         }
+      } catch (err) {
+        console.error('Failed to load assignment', err);
       }
-    }
+    };
+    fetchAssignmentData();
   }, [id]);
 
   if (!assignment) {
@@ -96,34 +135,26 @@ const StudentSubmitAssignment = () => {
     fileInputRef.current.click();
   };
 
-  const handleSubmitAssignment = () => {
+  const handleSubmitAssignment = async () => {
     if (!selectedFile) return;
 
-    // Update assignment status in localStorage
-    const stored = localStorage.getItem('student_assignments');
-    if (stored) {
-      const list = JSON.parse(stored);
-      const updatedList = list.map(item => {
-        if (item.id === id) {
-          return {
-            ...item,
-            status: 'Submitted',
-            grade: '--' 
-          };
-        }
-        return item;
-      });
-      localStorage.setItem('student_assignments', JSON.stringify(updatedList));
-      
-      // Update local page state
-      setAssignment({
-        ...assignment,
-        status: 'Submitted',
-        grade: '--'
-      });
-
-      alert('Assignment submitted successfully!');
-      navigate('/student/assignments');
+    // Use the enrollmentId (id) to submit
+    try {
+      const res = await gradeService.submitAssignment(assignment.id, selectedFile);
+      if (res.success) {
+        setAssignment({
+          ...assignment,
+          status: 'Submitted',
+          grade: '--'
+        });
+        alert('Assignment submitted successfully!');
+        navigate('/student/assignments');
+      } else {
+        alert(res.errors?.join('\n') || 'Failed to submit assignment');
+      }
+    } catch (err) {
+      console.error('Submission failed', err);
+      alert('An error occurred while submitting.');
     }
   };
 

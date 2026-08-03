@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Edit } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { userService, gradeService } from '../../api/services';
 import AvatarUploader from '../../components/profile/AvatarUploader';
 import AccountInformation from '../../components/profile/AccountInformation';
 import ChangePasswordCard from '../../components/profile/ChangePasswordCard';
@@ -13,13 +14,67 @@ import StudentAcademicInfo from '../../components/student/profile/StudentAcademi
 
 const StudentProfile = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [profileData, setProfileData] = useState(null); // null when no data
+  const [profileData, setProfileData] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Future API Integration
+  const fetchProfileData = async () => {
+    try {
+      setIsLoading(true);
+      const res = await userService.getMe();
+      if (res.success && res.result) {
+        const user = res.result;
+
+        // Optionally fetch grades to calculate GPA
+        let gpa = null;
+        if (user.studentCode) {
+          try {
+            const gradesRes = await gradeService.getStudentGrades(user.studentCode);
+            if (gradesRes.success && gradesRes.result && gradesRes.result.classes) {
+              const allGrades = gradesRes.result.classes.flatMap(c => c.grades);
+              if (allGrades.length > 0) {
+                // simple GPA calculation: average / 10 * 4 (approximation)
+                const sum = allGrades.reduce((acc, curr) => acc + curr.scores, 0);
+                const avg = sum / allGrades.length;
+                gpa = ((avg / 10) * 4).toFixed(2);
+              }
+            }
+          } catch (err) {
+            console.error('Failed to fetch grades for GPA', err);
+          }
+        }
+
+        setProfileData({
+          avatarUrl: null,
+          personalInfo: {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            fullName: (user.firstName + ' ' + user.lastName).trim(),
+            email: user.email,
+            phone: user.phone,
+            code: user.studentCode,
+            gender: user.gender,
+            dob: user.dateOfBirth ? new Date(user.dateOfBirth).toLocaleDateString() : undefined,
+          },
+          accountInfo: {
+            username: user.username,
+            role: user.role,
+            status: 'Active'
+          },
+          academicInfo: {
+            major: user.major,
+            gpa: gpa
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    // setIsLoading(true);
-    // fetchStudentProfile().then(data => setProfileData(data)).finally(() => setIsLoading(false));
+    fetchProfileData();
   }, []);
 
   if (isLoading) {
@@ -60,7 +115,7 @@ const StudentProfile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           {/* Left Column - Avatar & Account */}
           <div className="space-y-6">
-            <div className="bg-[var(--theme-sidebarBg)] border border-[var(--theme-border)] rounded-2xl shadow-sm">
+            <div className="bg-[var(--theme-sidebarBg)] border border-[var(--theme-border)] rounded-2xl shadow-sm overflow-hidden">
               <AvatarUploader 
                 avatarUrl={profileData?.avatarUrl} 
                 fullName={profileData?.personalInfo?.fullName} 
@@ -85,6 +140,7 @@ const StudentProfile = () => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         data={profileData?.personalInfo}
+        onProfileUpdated={fetchProfileData}
       />
     </motion.div>
   );

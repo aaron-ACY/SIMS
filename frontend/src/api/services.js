@@ -8,8 +8,8 @@ export const authService = {
 };
 
 export const userService = {
-  getMe: () => api.get('/users/me'),
-  updateMe: (data) => api.put('/users/me', data),
+  getMe: () => api.get('/users/profile'),
+  updateMe: (data) => api.put('/users/profile', data),
   getUsers: () => api.get('/users'),
   createUser: (data) => api.post('/users', data),
   createStudent: (data) => api.post('/users/student', data),
@@ -18,6 +18,7 @@ export const userService = {
 };
 
 export const studentService = {
+  getMyClasses: () => api.get('/students/me/classes'),
   getStudents: () => api.get('/students'),
   getStudentById: (id) => api.get(`/students/${id}`),
   createStudent: (data) => api.post('/students', data),

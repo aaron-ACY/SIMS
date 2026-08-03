@@ -3,16 +3,27 @@ import { School, User, Mail, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import EmptyClasses from '../../components/student/classes/EmptyClasses';
-
+import { studentService } from '../../api/services';
 const StudentClass = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [classList, setClassList] = useState([]);
 
-  // Future API Integration
   useEffect(() => {
-    // setIsLoading(true);
-    // fetchStudentClasses().then(data => setClassList(data)).finally(() => setIsLoading(false));
+    const fetchClasses = async () => {
+      setIsLoading(true);
+      try {
+        const res = await studentService.getMyClasses();
+        if (res.success && res.result) {
+          setClassList(res.result);
+        }
+      } catch (err) {
+        console.error('Failed to fetch student classes', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchClasses();
   }, []);
 
   const handleRowClick = (classId) => {
@@ -56,14 +67,14 @@ const StudentClass = () => {
               <tbody className="divide-y divide-[var(--theme-border)]">
                 {classList.map((cls, idx) => (
                   <tr 
-                    key={cls.id || idx} 
-                    onClick={() => handleRowClick(cls.id)}
+                    key={cls.classId || idx} 
+                    onClick={() => handleRowClick(cls.classId)}
                     className="group hover:bg-[var(--theme-hover)]/30 transition-colors cursor-pointer"
                   >
-                    <td className="py-5 px-6 font-mono text-sm group-hover:no-underline">{cls.id}</td>
-                    <td className="py-5 px-6 font-bold text-sm text-[var(--theme-text)] group-hover:text-[var(--theme-primary)] transition-colors group-hover:no-underline">{cls.name}</td>
-                    <td className="py-5 px-6 font-semibold text-sm text-[var(--theme-textMuted)] group-hover:no-underline">{cls.subject}</td>
-                    <td className="py-5 px-6 font-semibold text-sm text-[var(--theme-textMuted)] group-hover:no-underline">{cls.lecturer}</td>
+                    <td className="py-5 px-6 font-mono text-sm group-hover:no-underline">{cls.classId}</td>
+                    <td className="py-5 px-6 font-bold text-sm text-[var(--theme-text)] group-hover:text-[var(--theme-primary)] transition-colors group-hover:no-underline">{cls.classCode}</td>
+                    <td className="py-5 px-6 font-semibold text-sm text-[var(--theme-textMuted)] group-hover:no-underline">{cls.subjectName}</td>
+                    <td className="py-5 px-6 font-semibold text-sm text-[var(--theme-textMuted)] group-hover:no-underline">{cls.instructorName}</td>
                     <td className="py-5 px-6 font-semibold text-sm text-[var(--theme-textMuted)] group-hover:no-underline">{cls.semester}</td>
                   </tr>
                 ))}

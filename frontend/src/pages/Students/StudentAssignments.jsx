@@ -7,6 +7,7 @@ import AssignmentFilter from '../../components/student/assignments/AssignmentFil
 import AssignmentTable from '../../components/student/assignments/AssignmentTable';
 import EmptyAssignments from '../../components/student/assignments/EmptyAssignments';
 import PageHeader from '../../components/Shared/PageHeader';
+import { userService, studentService, gradeService } from '../../api/services';
 
 const StudentAssignments = () => {
   const navigate = useNavigate();
@@ -16,13 +17,67 @@ const StudentAssignments = () => {
   const [assignments, setAssignments] = useState([]);
   const [filterOptions, setFilterOptions] = useState([]);
 
-  // Future API Integration
   useEffect(() => {
-    // setIsLoading(true);
-    // fetchStudentAssignments().then(data => {
-    //   setAssignments(data.assignments);
-    //   setFilterOptions(data.availableClasses.map(c => ({ value: c.id, label: c.name })));
-    // }).finally(() => setIsLoading(false));
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const userRes = await userService.getMe();
+        if (!userRes.success || !userRes.result?.studentCode) return;
+        const studentCode = userRes.result.studentCode;
+
+        const [classesRes, gradesRes] = await Promise.all([
+          studentService.getMyClasses(),
+          gradeService.getStudentGrades(studentCode)
+        ]);
+
+        const classes = (classesRes.success ? classesRes.result : []) || [];
+        const gradesData = (gradesRes.success && gradesRes.result ? gradesRes.result.classes : []) || [];
+
+        // Build assignments list
+        const assignmentsData = classes.map(cls => {
+          let score = null;
+          let status = 'Pending';
+          
+          // Find grade for this class
+          const classGradeGroup = gradesData.find(g => g.classCode === cls.classCode && g.semester === cls.semester);
+          if (classGradeGroup && classGradeGroup.grades && classGradeGroup.grades.length > 0) {
+            // Assuming one grade per class subject
+            score = classGradeGroup.grades[0].scores;
+            if (score > 0 || classGradeGroup.grades[0].rating) {
+              status = 'Graded';
+            } else {
+              status = 'Submitted'; // Or pending if they haven't submitted, but we don't have submission status
+            }
+          }
+
+          return {
+            id: cls.enrollmentId,
+            title: `${cls.subjectName} Assignment`,
+            class: cls.classCode,
+            classId: cls.classId,
+            dueDate: 'End of Semester',
+            status: status,
+            score: score
+          };
+        });
+
+        setAssignments(assignmentsData);
+        
+        // Extract unique classes for filter
+        const uniqueClasses = Array.from(new Set(classes.map(c => c.classCode))).map(code => {
+          const c = classes.find(x => x.classCode === code);
+          return { value: code, label: `${c.classCode} - ${c.subjectName}` };
+        });
+        setFilterOptions(uniqueClasses);
+
+      } catch (err) {
+        console.error('Failed to fetch assignments', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const handleViewClick = (assignmentId) => {
@@ -64,7 +119,7 @@ const StudentAssignments = () => {
             </div>
           ) : assignments.length > 0 ? (
             <AssignmentTable 
-              assignments={assignments} 
+              assignments={filter === 'all' ? assignments : assignments.filter(a => a.class === filter)} 
               onViewClick={handleViewClick} 
             />
           ) : (

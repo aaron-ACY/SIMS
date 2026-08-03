@@ -8,4 +8,4 @@ Id, EnrollmentId, StudentId, ClassId, Score, Classification, SubmissionPath     
  7,            7,        10,       4,   9.0, Distinction   , files/7_assignment.pdf          , 2027-05-28T00:00:00.0000000Z, 2027-05-28T00:00:00.0000000Z
  8,            8,        11,       1,   9.5, Distinction   , files/8_assignment.pdf          , 2026-12-20T00:00:00.0000000Z, 2026-12-20T00:00:00.0000000Z
  9,            9,        11,       5,   8.2, Merit         , files/9_assignment.pdf          , 2027-05-20T00:00:00.0000000Z, 2027-05-20T00:00:00.0000000Z
-10,           10,        11,       6,   7.0, Pass          , files/10_assignment.pdf         , 2027-05-25T00:00:00.0000000Z, 2027-05-25T00:00:00.0000000Z
+10,           10,        11,       6,   null, null, null, null, null 
