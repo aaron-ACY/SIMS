@@ -23,14 +23,17 @@ public class UsersController : ControllerBase
 
     /// <summary>
     /// Returns the profile of the currently authenticated user.
+    /// The role is read from the JWT claim and used to load the matching
+    /// student / instructor record without an extra DB round-trip.
     /// Accessible by any authenticated role.
     /// </summary>
-    [HttpGet("me")]
+    [HttpGet("profile")]
     [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetMyProfile(CancellationToken ct)
     {
-        var profile = await _userService.GetMyProfileAsync(GetCurrentUserId(), ct);
+        var roleName = User.FindFirst(SIMS.Domain.Constants.CustomClaimTypes.Role)?.Value ?? string.Empty;
+        var profile  = await _userService.GetMyProfileAsync(GetCurrentUserId(), roleName, ct);
         return Ok(ApiResponse<UserProfileResponse>.Ok(profile));
     }
 

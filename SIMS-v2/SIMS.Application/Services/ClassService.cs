@@ -191,6 +191,52 @@ public class ClassService : IClassService
         }
     }
 
+    public async Task<IEnumerable<StudentClassResponse>> GetMyClassesAsync(int userId, CancellationToken ct = default)
+    {
+        var student = await _studentRepository.GetByUserIdAsync(userId)
+                      ?? throw new AppException(ErrorCode.STUDENT_NOT_EXISTED);
+
+        var enrollments = (await _enrollmentRepository.GetByStudentIdAsync(student.Id)).ToList();
+        if (enrollments.Count == 0) return [];
+
+        var classIds     = enrollments.Select(e => e.ClassId).ToHashSet();
+        var classMap     = (await _classRepository.GetAllAsync())
+                               .Where(c => classIds.Contains(c.Id))
+                               .ToDictionary(c => c.Id);
+        var subjectMap   = (await _subjectRepository.GetAllAsync()).ToDictionary(s => s.Id);
+        var instructorMap= (await _instructorRepository.GetAllAsync()).ToDictionary(i => i.Id);
+        var userMap      = (await _userRepository.GetAllAsync()).ToDictionary(u => u.Id, u => u.FullName);
+
+        return enrollments.Select(e =>
+        {
+            classMap.TryGetValue(e.ClassId, out var schoolClass);
+
+            var subjectName = schoolClass is not null &&
+                              subjectMap.TryGetValue(schoolClass.SubjectId, out var sub)
+                              ? sub.Name : string.Empty;
+
+            var instructorName = string.Empty;
+            if (schoolClass is not null &&
+                instructorMap.TryGetValue(schoolClass.InstructorId, out var inst) &&
+                inst.UserId.HasValue)
+                userMap.TryGetValue(inst.UserId.Value, out instructorName);
+
+            return new StudentClassResponse
+            {
+                EnrollmentId   = e.Id,
+                ClassId        = e.ClassId,
+                ClassCode      = schoolClass?.ClassCode     ?? string.Empty,
+                SubjectName    = subjectName,
+                InstructorName = instructorName             ?? string.Empty,
+                Semester       = schoolClass?.Semester      ?? 0,
+                AcademicYear   = schoolClass?.AcademicYear  ?? string.Empty,
+                Room           = schoolClass?.Room          ?? string.Empty,
+                Schedule       = schoolClass?.Schedule      ?? string.Empty,
+                IsActive       = schoolClass?.IsActive      ?? false
+            };
+        });
+    }
+
     public async Task RemoveStudentAsync(int classId, int studentId, CancellationToken ct = default)
     {
         // Serialise removal for the same class so the delete-enrollment →
