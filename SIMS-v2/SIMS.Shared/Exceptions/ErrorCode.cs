@@ -51,6 +51,9 @@ public sealed class ErrorCode
     public static readonly ErrorCode CANNOT_DELETE_SELF =
         new(1014, "You cannot delete your own account", HttpStatusCode.BadRequest);
 
+    public static readonly ErrorCode WRONG_CURRENT_PASSWORD =
+        new(1044, "Current password is incorrect", HttpStatusCode.BadRequest);
+
     public static readonly ErrorCode USER_HAS_ACTIVE_ENROLLMENTS =
         new(1033, "Cannot delete student — they have active class enrollments",
             HttpStatusCode.Conflict);
