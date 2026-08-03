@@ -29,6 +29,12 @@ public class GradeRepository : CsvRepositoryBase<Grade>, IGradeRepository
         return grades.Where(g => g.StudentId == studentId);
     }
 
+    public async Task<IEnumerable<Grade>> GetByClassIdAsync(int classId)
+    {
+        var grades = await ReadAllAsync();
+        return grades.Where(g => g.ClassId == classId);
+    }
+
     public Task AddAsync(Grade grade) =>
         ReadModifyWriteAsync(grades =>
         {
