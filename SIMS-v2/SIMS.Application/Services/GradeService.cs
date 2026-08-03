@@ -120,52 +120,49 @@ public class GradeService : IGradeService
                      .OrderByDescending(g => g.GradedAt)
                      .ToList();
 
-        // Load all classes and subjects once, then use dictionary lookup
-        // inside the loop — avoids 2N CSV reads (one per grade) and
-        // replaces them with 2 reads total.
-        var classMap   = (await _classRepository.GetAllAsync())
-                             .ToDictionary(c => c.Id);
-        var subjectMap = (await _subjectRepository.GetAllAsync())
-                             .ToDictionary(s => s.Id);
+        // Load all classes and subjects once to avoid N read calls.
+        var classMap   = (await _classRepository.GetAllAsync()).ToDictionary(c => c.Id);
+        var subjectMap = (await _subjectRepository.GetAllAsync()).ToDictionary(s => s.Id);
 
-        // Top-level class/semester: taken from the most-recent grade's class.
-        string classCode   = string.Empty;
-        int    semester    = 0;
-        bool   topLevelSet = false;
-
-        var gradeItems = new List<GradeItemResponse>();
-
-        foreach (var grade in grades)
-        {
-            classMap.TryGetValue(grade.ClassId, out var schoolClass);
-            var subject = schoolClass is not null &&
-                          subjectMap.TryGetValue(schoolClass.SubjectId, out var s)
-                          ? s : null;
-
-            if (!topLevelSet && schoolClass is not null)
+        // Group grades by the class they belong to so the frontend can render
+        // a per-class breakdown — fixing the bug where all grades were reported
+        // under whichever class happened to be graded most recently.
+        var classGroups = grades
+            .GroupBy(g => g.ClassId)
+            .Select(group =>
             {
-                classCode   = schoolClass.ClassCode;
-                semester    = schoolClass.Semester;
-                topLevelSet = true;
-            }
+                classMap.TryGetValue(group.Key, out var schoolClass);
 
-            gradeItems.Add(new GradeItemResponse
-            {
-                SubjectCode = subject?.SubjectCode ?? string.Empty,
-                SubjectName = subject?.Name        ?? string.Empty,
-                Scores      = grade.Score,
-                Rating      = grade.Classification
-            });
-        }
+                var gradeItems = group.Select(grade =>
+                {
+                    var subject = schoolClass is not null &&
+                                  subjectMap.TryGetValue(schoolClass.SubjectId, out var s)
+                                  ? s : null;
+
+                    return new GradeItemResponse
+                    {
+                        SubjectCode = subject?.SubjectCode ?? string.Empty,
+                        SubjectName = subject?.Name        ?? string.Empty,
+                        Scores      = grade.Score,
+                        Rating      = grade.Classification
+                    };
+                }).ToList();
+
+                return new ClassGradeGroup
+                {
+                    ClassCode = schoolClass?.ClassCode ?? string.Empty,
+                    Semester  = schoolClass?.Semester  ?? 0,
+                    Grades    = gradeItems
+                };
+            })
+            .ToList();
 
         return new StudentGradeReportResponse
         {
             StudentCode = student.StudentCode,
             FirstName   = user?.FirstName ?? string.Empty,
             LastName    = user?.LastName  ?? string.Empty,
-            Class       = classCode,
-            Semester    = semester,
-            Grades      = gradeItems
+            Classes     = classGroups
         };
     }
 

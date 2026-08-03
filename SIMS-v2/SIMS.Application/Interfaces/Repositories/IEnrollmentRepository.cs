@@ -6,6 +6,10 @@ public interface IEnrollmentRepository
 {
     Task<Enrollment?> GetByIdAsync(int id);
     Task<IEnumerable<Enrollment>> GetByClassIdAsync(int classId);
+
+    /// <summary>Returns all active enrollments for the given student.</summary>
+    Task<IEnumerable<Enrollment>> GetByStudentIdAsync(int studentId);
+
     Task<Enrollment?> GetAsync(int classId, int studentId);
     Task AddAsync(Enrollment enrollment);
 

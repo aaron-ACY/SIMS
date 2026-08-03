@@ -5,11 +5,11 @@ namespace SIMS.Application.Interfaces.Services;
 public interface IUserService
 {
     /// <summary>
-    /// Returns the profile of a single user by ID (fetched from DB).
-    /// Used by GET /api/users/me — email is no longer in the JWT so
-    /// we load it from the CSV store.
+    /// Returns the profile of the authenticated user.
+    /// Used by GET /api/users/profile. The <paramref name="roleName"/> is read
+    /// from the JWT claim so no extra role DB round-trip is needed.
     /// </summary>
-    Task<UserProfileResponse> GetMyProfileAsync(int userId, CancellationToken ct = default);
+    Task<UserProfileResponse> GetMyProfileAsync(int userId, string roleName, CancellationToken ct = default);
 
     /// <summary>Returns all users with role name and permissions resolved. Admin only.</summary>
     Task<IEnumerable<UserProfileResponse>> GetAllAsync(CancellationToken ct = default);

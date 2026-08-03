@@ -19,4 +19,11 @@ public interface IClassService
 
     /// <summary>Removes a student from a class. Requires the GETOUT permission.</summary>
     Task RemoveStudentAsync(int classId, int studentId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Returns all classes the given student (identified by their User.Id from the JWT)
+    /// is currently enrolled in, together with the enrollmentId needed for assignment submission.
+    /// Accessible by any authenticated student.
+    /// </summary>
+    Task<IEnumerable<StudentClassResponse>> GetMyClassesAsync(int userId, CancellationToken ct = default);
 }
