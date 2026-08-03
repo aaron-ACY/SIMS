@@ -289,6 +289,25 @@ public class UserService : IUserService
         return MapToProfile(user, roleName, student, instructor);
     }
 
+    public async Task ChangePasswordAsync(int userId, ChangePasswordRequest request, CancellationToken ct = default)
+    {
+        var user = await _userRepository.GetByIdAsync(userId)
+                   ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
+
+        // Verify the current password before accepting the new one.
+        if (!_passwordHasher.VerifyPassword(request.CurrentPassword, user.PasswordHash, user.Salt))
+            throw new AppException(ErrorCode.WRONG_CURRENT_PASSWORD);
+
+        if (request.NewPassword.Length < MinPasswordLength)
+            throw new AppException(ErrorCode.INVALID_PASSWORD);
+
+        var (hash, salt) = _passwordHasher.HashPassword(request.NewPassword);
+        user.PasswordHash = hash;
+        user.Salt         = salt;
+
+        await _userRepository.UpdateAsync(user);
+    }
+
     public async Task DeleteAsync(int userId, int currentUserId, CancellationToken ct = default)
     {
         // Guard against an admin locking themselves out of the system.

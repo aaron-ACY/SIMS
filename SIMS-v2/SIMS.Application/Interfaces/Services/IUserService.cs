@@ -40,6 +40,15 @@ public interface IUserService
     Task<UserProfileResponse> CreateInstructorUserAsync(CreateInstructorUserRequest request, CancellationToken ct = default);
 
     /// <summary>
+    /// Changes the password of the authenticated caller.
+    /// Verifies the current password before applying the new one.
+    /// Requires the CHANGE_PASSWORD permission (Instructor and Student roles).
+    /// </summary>
+    /// <param name="userId">The caller's own account ID, read from the JWT.</param>
+    /// <param name="request">Contains the current and new password.</param>
+    Task ChangePasswordAsync(int userId, ChangePasswordRequest request, CancellationToken ct = default);
+
+    /// <summary>
     /// Deletes a user account. Requires the DELETE_USER permission.
     /// </summary>
     /// <param name="userId">The account to delete.</param>
