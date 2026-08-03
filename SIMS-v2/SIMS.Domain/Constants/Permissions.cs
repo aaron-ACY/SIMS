@@ -49,6 +49,9 @@ public static class Permissions
     public const string Enrollments           = "ENROLLMENTS";
     public const string GetOut                = "GETOUT";
 
+    // ── Account ───────────────────────────────────────────────────────── //
+    public const string ChangePassword = "CHANGE_PASSWORD";
+
     // ── Grades ────────────────────────────────────────────────────────── //
     public const string EnterGrade       = "ENTER_GRADE";
     public const string EditGrade        = "EDIT_GRADE";
@@ -120,6 +123,7 @@ public static class Permissions
         ViewScore,
         ViewClassGrades,
         Submitted,
-        EditProfile
+        EditProfile,
+        ChangePassword
     ];
 }
