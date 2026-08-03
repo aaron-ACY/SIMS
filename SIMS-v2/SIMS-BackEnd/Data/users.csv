@@ -1,7 +1,7 @@
 Id,Username,Email,PasswordHash,Salt,FirstName,LastName,RoleId,IsActive,CreatedAt,UpdatedAt
 1,admin,admin@sims.edu,PJKrmJPzCdJRTXTDdYSrISEM02CTv4XykdB69VslBdA=,5U0Y1K2aXeajq1SSvalIEw==,System,Admin,1,True,2026-07-29T09:30:49.7917929Z,2026-07-29T09:30:49.7917929Z
 2,tranngoczit,user@example.com,pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=,y7EVVwmLsZmPcmofQ/9cdQ==,Ngoc,Zit,3,True,2026-07-29T09:30:49.7917929Z,2026-07-29T09:30:49.7917929Z
-3,okuzchan,okuz@example.com,RnunkGNseYEcUv8DnRJphbbSSTAeNmIn3xny4iYM/dM=,OkOKOZ3vodJmSqzvJVw0Fg==,nguyen,gay,2,True,2026-07-29T09:30:49.7917929Z,2026-08-03T04:29:31.9382241Z
+3,okuzchan,okuz@example.com,RnunkGNseYEcUv8DnRJphbbSSTAeNmIn3xny4iYM/dM=,OkOKOZ3vodJmSqzvJVw0Fg==,david,vu,2,True,2026-07-29T09:30:49.7917929Z,2026-08-03T05:01:40.8818379Z
 4,nguyenvana,nguyenvana@sims.edu,pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=,y7EVVwmLsZmPcmofQ/9cdQ==,Van A,Nguyen,2,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z
 5,tranthib,tranthib@sims.edu,pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=,y7EVVwmLsZmPcmofQ/9cdQ==,Thi B,Tran,2,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z
 6,levanc,levanc@sims.edu,pv68eG2xYYjYdKl72+frZFfwT2RNV0E5daDv1q9kx1k=,y7EVVwmLsZmPcmofQ/9cdQ==,Van C,Le,2,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z

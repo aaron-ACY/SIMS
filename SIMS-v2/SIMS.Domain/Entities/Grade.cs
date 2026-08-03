@@ -14,14 +14,18 @@ public class Grade
     /// <summary>FK to classes.csv — denormalised for quick lookup.</summary>
     public int    ClassId      { get; set; }
 
-    /// <summary>Numeric score in the range 0–10.</summary>
-    public double Score        { get; set; }
+    /// <summary>
+    /// Numeric score in the range 0–10.
+    /// Null until an instructor formally enters a score.
+    /// </summary>
+    public double? Score        { get; set; }
 
     /// <summary>
     /// Classification derived from Score:
     /// Refer (&lt;6.5) | Pass (6.5–7.9) | Merit (8–8.9) | Distinction (9–10).
+    /// Null until an instructor formally enters a score.
     /// </summary>
-    public string Classification { get; set; } = string.Empty;
+    public string? Classification { get; set; }
 
     /// <summary>
     /// Relative path to the submitted assignment file inside Data/files/.

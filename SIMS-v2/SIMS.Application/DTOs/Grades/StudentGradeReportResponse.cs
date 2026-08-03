@@ -29,6 +29,9 @@ public class GradeItemResponse
 {
     public string SubjectCode { get; set; } = string.Empty;
     public string SubjectName { get; set; } = string.Empty;
-    public double Scores      { get; set; }
-    public string Rating      { get; set; } = string.Empty;
+    /// <summary>Null when the grade has not yet been entered by an instructor.</summary>
+    public double? Scores      { get; set; }
+
+    /// <summary>Null when the grade has not yet been entered by an instructor.</summary>
+    public string? Rating      { get; set; }
 }
