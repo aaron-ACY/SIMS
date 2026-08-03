@@ -111,9 +111,11 @@ public class UsersController : ControllerBase
 
     /// <summary>
     /// Updates the personal information of the authenticated caller.
+    /// The role is read from the JWT so the phone field is routed to the correct
+    /// student / instructor profile record without an extra DB lookup.
     /// Requires the EDIT_PROFILE permission.
     /// </summary>
-    [HttpPut("me")]
+    [HttpPut("profile")]
     [Authorize(Policy = Permissions.EditProfile)]
     [ProducesResponseType(typeof(ApiResponse<UserProfileResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
@@ -122,7 +124,8 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> UpdateMyInfo([FromBody] UpdateMyInfoRequest request, CancellationToken ct)
     {
-        var profile = await _userService.UpdateMyInfoAsync(GetCurrentUserId(), request, ct);
+        var roleName = User.FindFirst(SIMS.Domain.Constants.CustomClaimTypes.Role)?.Value ?? string.Empty;
+        var profile  = await _userService.UpdateMyInfoAsync(GetCurrentUserId(), roleName, request, ct);
         return Ok(ApiResponse<UserProfileResponse>.Ok(profile, "Information updated successfully."));
     }
 

@@ -226,36 +226,65 @@ public class UserService : IUserService
         return MapToProfile(user, role.Name, student: null, instructor: null);
     }
 
-    public async Task<UserProfileResponse> UpdateMyInfoAsync(int userId, UpdateMyInfoRequest request, CancellationToken ct = default)
+    public async Task<UserProfileResponse> UpdateMyInfoAsync(int userId, string roleName, UpdateMyInfoRequest request, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId)
                    ?? throw new AppException(ErrorCode.USER_NOT_EXISTED);
 
-        var email = request.Email.Trim().ToLowerInvariant();
+        // Apply only the fields that were explicitly provided (non-null).
+        if (request.Email is not null)
+        {
+            var email = request.Email.Trim().ToLowerInvariant();
 
-        // The email must stay unique across accounts — but the caller keeping
-        // their own address unchanged is not a conflict.
-        var existing = await _userRepository.GetByEmailAsync(email);
-        if (existing is not null && existing.Id != userId)
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
+            // The email must stay unique across accounts — but the caller keeping
+            // their own address unchanged is not a conflict.
+            var existing = await _userRepository.GetByEmailAsync(email);
+            if (existing is not null && existing.Id != userId)
+                throw new AppException(ErrorCode.EMAIL_EXISTED);
 
-        user.Email     = email;
-        user.FirstName = request.FirstName.Trim();
-        user.LastName  = request.LastName.Trim();
+            user.Email = email;
+        }
+
+        if (request.FirstName is not null)
+            user.FirstName = request.FirstName.Trim();
+
+        if (request.LastName is not null)
+            user.LastName = request.LastName.Trim();
 
         // UpdateAsync refreshes UpdatedAt.
         await _userRepository.UpdateAsync(user);
 
-        var role     = await _roleRepository.GetByIdAsync(user.RoleId);
-        var roleName = role?.Name ?? string.Empty;
-
+        // Role is passed in from the JWT claim — no extra role DB round-trip needed.
         Student?    student    = null;
         Instructor? instructor = null;
+        var phone = request.Phone?.Trim();
 
         if (roleName == Roles.Student)
+        {
             student = await _studentRepository.GetByUserIdAsync(userId);
+            if (student is not null)
+            {
+                if (request.Email     is not null) student.Email     = user.Email;
+                if (request.FirstName is not null) student.FirstName = user.FirstName;
+                if (request.LastName  is not null) student.LastName  = user.LastName;
+                if (phone is { Length: > 0 })      student.Phone     = phone;
+
+                await _studentRepository.UpdateAsync(student);
+            }
+        }
         else if (roleName == Roles.Instructor)
+        {
             instructor = await _instructorRepository.GetByUserIdAsync(userId);
+            if (instructor is not null)
+            {
+                if (request.Email     is not null) instructor.Email     = user.Email;
+                if (request.FirstName is not null) instructor.FirstName = user.FirstName;
+                if (request.LastName  is not null) instructor.LastName  = user.LastName;
+                if (phone is { Length: > 0 })      instructor.Phone     = phone;
+
+                await _instructorRepository.UpdateAsync(instructor);
+            }
+        }
 
         return MapToProfile(user, roleName, student, instructor);
     }

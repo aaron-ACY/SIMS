@@ -20,10 +20,12 @@ public interface IUserService
     Task<UserProfileResponse> CreateAsync(CreateUserRequest request, CancellationToken ct = default);
 
     /// <summary>
-    /// Updates the caller's own first name, last name and email.
+    /// Updates the caller's own email, first name, last name, and phone.
+    /// The <paramref name="roleName"/> is read from the JWT claim so the service
+    /// can route the phone update to the correct profile record without a role DB lookup.
     /// Requires the EDIT_PROFILE permission.
     /// </summary>
-    Task<UserProfileResponse> UpdateMyInfoAsync(int userId, UpdateMyInfoRequest request, CancellationToken ct = default);
+    Task<UserProfileResponse> UpdateMyInfoAsync(int userId, string roleName, UpdateMyInfoRequest request, CancellationToken ct = default);
 
     /// <summary>
     /// Creates a user account (role = Student) together with the student profile
