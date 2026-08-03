@@ -18,8 +18,11 @@ public class GradeResponse
     /// <summary>Empty when the referenced class no longer exists.</summary>
     public string ClassCode      { get; set; } = string.Empty;
 
-    public double Score          { get; set; }
-    public string Classification { get; set; } = string.Empty;
+    /// <summary>Null until an instructor formally enters a score.</summary>
+    public double? Score          { get; set; }
+
+    /// <summary>Null until an instructor formally enters a score.</summary>
+    public string? Classification { get; set; }
 
     /// <summary>
     /// Relative path to the submitted file inside Data/files/.

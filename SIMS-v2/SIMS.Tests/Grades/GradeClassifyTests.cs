@@ -338,7 +338,79 @@ public class GradeServiceTests
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // 4. Xếp loại điểm số (Classify)
+    // 4. Trạng thái null khi chưa chấm điểm
+    // ══════════════════════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Lần đầu nộp bài — Score và Classification phải là null (chưa nhập điểm).
+    /// </summary>
+    [Fact]
+    public async Task SubmitAsync_WhenFirstSubmission_ScoreAndClassificationShouldBeNull()
+    {
+        // Arrange
+        _enrollmentRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(SampleEnrollment());
+        _gradeRepo.Setup(r => r.GetByEnrollmentIdAsync(1)).ReturnsAsync((Grade?)null);
+        _gradeRepo.Setup(r => r.AddAsync(It.IsAny<Grade>())).Returns(Task.CompletedTask);
+        SetupBuildResponse();
+
+        var sut = BuildService();
+
+        // Act
+        var result = await sut.SubmitAsync(1, "files/1_xyz.pdf");
+
+        // Assert
+        result.Score.Should().BeNull();
+        result.Classification.Should().BeNull();
+        result.GradedAt.Should().BeNull();
+        result.SubmissionPath.Should().Be("files/1_xyz.pdf");
+    }
+
+    /// <summary>
+    /// Sau khi nhập điểm (CreateAsync), Score và Classification phải được gán đúng.
+    /// </summary>
+    [Fact]
+    public async Task CreateAsync_WhenGradeEntered_ScoreAndClassificationShouldNotBeNull()
+    {
+        // Arrange
+        _enrollmentRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(SampleEnrollment());
+        _gradeRepo.Setup(r => r.GetByEnrollmentIdAsync(1)).ReturnsAsync(SubmittedGrade());
+        _gradeRepo.Setup(r => r.UpdateAsync(It.IsAny<Grade>())).ReturnsAsync(true);
+        SetupBuildResponse();
+
+        var sut = BuildService();
+
+        // Act
+        var result = await sut.CreateAsync(new CreateGradeRequest { EnrollmentId = 1, Score = 7.5 });
+
+        // Assert
+        result.Score.Should().NotBeNull().And.Be(7.5);
+        result.Classification.Should().NotBeNullOrEmpty().And.Be("Pass");
+        result.GradedAt.Should().NotBeNull();
+    }
+
+    /// <summary>
+    /// Sau khi sửa điểm (UpdateAsync), Score và Classification phải được cập nhật đúng.
+    /// </summary>
+    [Fact]
+    public async Task UpdateAsync_WhenGradeUpdated_ScoreAndClassificationShouldReflectNewValues()
+    {
+        // Arrange
+        _gradeRepo.Setup(r => r.GetByIdAsync(5)).ReturnsAsync(GradedGrade(id: 5));
+        _gradeRepo.Setup(r => r.UpdateAsync(It.IsAny<Grade>())).ReturnsAsync(true);
+        SetupBuildResponse();
+
+        var sut = BuildService();
+
+        // Act
+        var result = await sut.UpdateAsync(5, new UpdateGradeRequest { Score = 6.0 });
+
+        // Assert
+        result.Score.Should().Be(6.0);
+        result.Classification.Should().Be("Refer");  // 6.0 < 6.5
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // 5. Xếp loại điểm số (Classify)
     // ══════════════════════════════════════════════════════════════════════
 
     [Theory]
