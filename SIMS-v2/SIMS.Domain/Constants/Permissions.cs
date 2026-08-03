@@ -50,15 +50,21 @@ public static class Permissions
     public const string GetOut                = "GETOUT";
 
     // ── Grades ────────────────────────────────────────────────────────── //
-    public const string EnterGrade  = "ENTER_GRADE";
-    public const string EditGrade   = "EDIT_GRADE";
-    public const string ViewScore   = "VIEW_SCORE";
+    public const string EnterGrade       = "ENTER_GRADE";
+    public const string EditGrade        = "EDIT_GRADE";
+    public const string ViewScore        = "VIEW_SCORE";
+
+    /// <summary>
+    /// Allows an instructor (or admin) to list all grade/submission records
+    /// for every student enrolled in a given class.
+    /// </summary>
+    public const string ViewClassGrades  = "VIEW_CLASS_GRADES";
 
     /// <summary>
     /// Allows a student to submit an assignment file for an enrollment.
     /// Must be held before an instructor can enter a grade.
     /// </summary>
-    public const string Submitted   = "SUBMITTED";
+    public const string Submitted        = "SUBMITTED";
 
     // ── Permissions management ────────────────────────────────────────── //
     public const string ViewPermissions  = "VIEW_PERMISSIONS";
@@ -112,6 +118,7 @@ public static class Permissions
         EnterGrade,
         EditGrade,
         ViewScore,
+        ViewClassGrades,
         Submitted,
         EditProfile
     ];

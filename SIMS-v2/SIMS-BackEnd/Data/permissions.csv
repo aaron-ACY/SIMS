@@ -35,3 +35,4 @@ Id, Name              , Description
 35, VIEW_COURSES      , View course list
 36, CREATE_COURSE     , Create new course
 37, DELETE_COURSE     , Delete course records
+38, VIEW_CLASS_GRADES , View grade and submission records for a class

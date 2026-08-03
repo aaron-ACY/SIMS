@@ -102,6 +102,23 @@ public class GradesController : ControllerBase
     }
 
     /// <summary>
+    /// Returns all grade/submission records for every student enrolled in the class.
+    /// Instructors use this to see who has submitted, what file they sent, and
+    /// whether a score has been entered. Requires the VIEW_CLASS_GRADES permission.
+    /// </summary>
+    [HttpGet("class/{classId:int}")]
+    [Authorize(Policy = Permissions.ViewClassGrades)]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<GradeResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetClassGrades(int classId, CancellationToken ct)
+    {
+        var grades = await _gradeService.GetGradesByClassIdAsync(classId, ct);
+        return Ok(ApiResponse<IEnumerable<GradeResponse>>.Ok(grades));
+    }
+
+    /// <summary>
     /// Returns the aggregated grade report for the student with the given student code.
     /// Requires the VIEW_SCORE permission.
     /// </summary>

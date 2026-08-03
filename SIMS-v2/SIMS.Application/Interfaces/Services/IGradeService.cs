@@ -33,4 +33,9 @@ public interface IGradeService
     /// Requires VIEW_SCORE.
     /// </summary>
     Task<StudentGradeReportResponse> GetScoresByStudentCodeAsync(string studentCode, CancellationToken ct = default);
+    /// <summary>
+    /// Returns all grade/submission records for every enrollment in the given class.
+    /// Requires VIEW_CLASS_GRADES.
+    /// </summary>
+    Task<IEnumerable<GradeResponse>> GetGradesByClassIdAsync(int classId, CancellationToken ct = default);
 }

@@ -8,6 +8,9 @@ public class GradeResponse
     public int    StudentId      { get; set; }
 
     /// <summary>Empty when the referenced student no longer exists.</summary>
+    public string StudentCode    { get; set; } = string.Empty;
+
+    /// <summary>Empty when the referenced student no longer exists.</summary>
     public string StudentName    { get; set; } = string.Empty;
 
     public int    ClassId        { get; set; }

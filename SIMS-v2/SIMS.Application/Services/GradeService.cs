@@ -183,6 +183,22 @@ public class GradeService : IGradeService
         _      => "Refer"
     };
 
+    public async Task<IEnumerable<GradeResponse>> GetGradesByClassIdAsync(int classId, CancellationToken ct = default)
+    {
+        if (await _classRepository.GetByIdAsync(classId) is null)
+            throw new AppException(ErrorCode.CLASS_NOT_EXISTED);
+
+        var grades = (await _gradeRepository.GetByClassIdAsync(classId)).ToList();
+
+        var results = new List<GradeResponse>(grades.Count);
+        foreach (var grade in grades)
+            results.Add(await BuildResponseAsync(grade));
+
+        return results;
+    }
+
+    // ------------------------------------------------------------------ //
+
     private async Task<GradeResponse> BuildResponseAsync(Grade grade)
     {
         var student     = await _studentRepository.GetByIdAsync(grade.StudentId);
@@ -201,6 +217,7 @@ public class GradeService : IGradeService
             Id             = grade.Id,
             EnrollmentId   = grade.EnrollmentId,
             StudentId      = grade.StudentId,
+            StudentCode    = student?.StudentCode ?? string.Empty,
             StudentName    = studentName,
             ClassId        = grade.ClassId,
             ClassCode      = schoolClass?.ClassCode ?? string.Empty,
