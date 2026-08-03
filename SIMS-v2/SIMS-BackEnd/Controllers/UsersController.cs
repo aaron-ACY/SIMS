@@ -110,6 +110,24 @@ public class UsersController : ControllerBase
     }
 
     /// <summary>
+    /// Changes the password of the authenticated caller.
+    /// The current password must be supplied to verify identity.
+    /// Requires the CHANGE_PASSWORD permission (Instructor and Student roles).
+    /// </summary>
+    [HttpPut("change-password")]
+    [Authorize(Policy = Permissions.ChangePassword)]
+    [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken ct)
+    {
+        await _userService.ChangePasswordAsync(GetCurrentUserId(), request, ct);
+        return Ok(ApiResponse.Ok("Password changed successfully."));
+    }
+
+    /// <summary>
     /// Updates the personal information of the authenticated caller.
     /// The role is read from the JWT so the phone field is routed to the correct
     /// student / instructor profile record without an extra DB lookup.

@@ -36,3 +36,4 @@ Id, Name              , Description
 36, CREATE_COURSE     , Create new course
 37, DELETE_COURSE     , Delete course records
 38, VIEW_CLASS_GRADES , View grade and submission records for a class
+39, CHANGE_PASSWORD   , Change own account password
