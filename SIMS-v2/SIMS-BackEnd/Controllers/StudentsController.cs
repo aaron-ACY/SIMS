@@ -1,8 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SIMS.Application.DTOs.Classes;
 using SIMS.Application.DTOs.Students;
 using SIMS.Application.Interfaces.Services;
 using SIMS.Domain.Constants;
+using SIMS.Shared.Exceptions;
 using SIMS.Shared.Models;
 
 namespace SIMS_BackEnd.Controllers;
@@ -13,10 +16,28 @@ namespace SIMS_BackEnd.Controllers;
 public class StudentsController : ControllerBase
 {
     private readonly IStudentService _studentService;
+    private readonly IClassService   _classService;
 
-    public StudentsController(IStudentService studentService)
+    public StudentsController(IStudentService studentService, IClassService classService)
     {
         _studentService = studentService;
+        _classService   = classService;
+    }
+
+    /// <summary>
+    /// Returns all classes the authenticated student is currently enrolled in,
+    /// including the enrollmentId needed to submit assignments.
+    /// Accessible by any authenticated student — no extra permission required
+    /// since the response is scoped to the caller's own data.
+    /// </summary>
+    [HttpGet("me/classes")]
+    [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentClassResponse>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponse<object?>), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetMyClasses(CancellationToken ct)
+    {
+        var classes = await _classService.GetMyClassesAsync(GetCurrentUserId(), ct);
+        return Ok(ApiResponse<IEnumerable<StudentClassResponse>>.Ok(classes));
     }
 
     /// <summary>Returns all students with name and email resolved from the linked user.</summary>
@@ -108,5 +129,15 @@ public class StudentsController : ControllerBase
     {
         await _studentService.DeleteAsync(id, ct);
         return Ok(ApiResponse<object?>.Ok(null));
+    }
+
+    // ------------------------------------------------------------------ //
+
+    private int GetCurrentUserId()
+    {
+        if (!int.TryParse(User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value, out var userId))
+            throw new AppException(ErrorCode.INVALID_TOKEN, "Invalid token claims.");
+
+        return userId;
     }
 }
