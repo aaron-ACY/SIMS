@@ -1,10 +1,10 @@
-Id, UserId, InstructorCode, FirstName, LastName, Email               , Department             , Degree, Phone     , IsActive, CreatedAt                   , UpdatedAt
- 1,      3, GV00001       , david    , vu      , okuz@example.com    , Information Technology , Master, 0901234567, True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
- 2,      4, GV00002       , Van A    , Nguyen  , nguyenvana@sims.edu , Computer Science       , PhD   , 0902345678, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
- 3,      5, GV00003       , Thi B    , Tran    , tranthib@sims.edu   , Business Administration, Master, 0903456789, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
- 4,      6, GV00004       , Van C    , Le      , levanc@sims.edu     , Information Technology , Master, 0904567890, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
- 5,      7, GV00005       , Thi D    , Pham    , phamthid@sims.edu   , Information Technology , PhD   , 0905678901, True    , 2026-07-30T00:00:00.0000000Z, 2026-07-30T00:00:00.0000000Z
- 6,     20, GV005         , Nam      , Nguyen  , nam.nguyen@gmail.com, Computer Science       , PhD   ,  956364012, True    , 2026-08-01T13:36:14.7807989Z, 2026-08-01T13:36:14.7846578Z
- 7,       , GV006         , Hoa      , Tran    , hoa.tran@gmail.com  , Information Technology , Master,  956987012, True    , 2026-08-01T13:36:14.8154159Z, 2026-08-01T13:36:14.8185466Z
- 8,       , GV007         , Long     , Le      , long.le@gmail.com   , Software Engineering   , PhD   ,  956715712, True    , 2026-08-01T13:36:14.8559833Z, 2026-08-01T13:36:14.8599986Z
- 9,       , GV008         , Lan      , Pham    , lan.pham@gmail.com  , Business Administration, Master,  986289012, True    , 2026-08-01T13:36:14.8981632Z, 2026-08-01T13:36:14.9016065Z
+Id,UserId,InstructorCode,FirstName,LastName,Email,Department,Degree,Phone,IsActive,CreatedAt,UpdatedAt
+1,3,GV00001,david,vu,okuz@example.com,Information Technology,Master,0901234567,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+2,4,GV00002,Van A,Nguyen,nguyenvana@sims.edu,Computer Science,PhD,0902345678,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z
+3,5,GV00003,Thi B,Tran,tranthib@sims.edu,Business Administration,Master,0903456789,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z
+4,6,GV00004,Van C,Le,levanc@sims.edu,Information Technology,Master,0904567890,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z
+5,7,GV00005,Thi D,Pham,phamthid@sims.edu,Information Technology,PhD,0905678901,True,2026-07-30T00:00:00.0000000Z,2026-07-30T00:00:00.0000000Z
+6,20,GV005,Nam,Nguyen,nam.nguyen@gmail.com,Computer Science,PhD,956364012,True,2026-08-01T13:36:14.7807989Z,2026-08-01T13:36:14.7846578Z
+7,,GV006,Hoa,Tran,hoa.tran@gmail.com,Information Technology,Master,956987012,True,2026-08-01T13:36:14.8154159Z,2026-08-01T13:36:14.8185466Z
+8,,GV007,Long,Le,long.le@gmail.com,Software Engineering,PhD,956715712,True,2026-08-01T13:36:14.8559833Z,2026-08-01T13:36:14.8599986Z
+9,,GV008,Lan,Pham,lan.pham@gmail.com,Business Administration,Master,986289012,True,2026-08-01T13:36:14.8981632Z,2026-08-01T13:36:14.9016065Z

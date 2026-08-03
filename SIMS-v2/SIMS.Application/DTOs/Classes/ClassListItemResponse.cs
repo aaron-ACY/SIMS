@@ -12,6 +12,7 @@ public class ClassListItemResponse
     /// <summary>FK to instructors.csv (Instructor.Id). Use this for reliable filtering instead of name comparison.</summary>
     public int    InstructorId      { get; set; }
 
+    public string InstructorCode    { get; set; } = string.Empty;
     public string InstructorName    { get; set; } = string.Empty;
     public int    MaxEnrollment     { get; set; }
     public int    CurrentEnrollment { get; set; }

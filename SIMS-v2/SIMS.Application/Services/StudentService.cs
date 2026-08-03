@@ -333,6 +333,7 @@ public class StudentService : IStudentService
 
         return new StudentResponse
         {
+            UserId         = student.UserId,
             StudentCode    = student.StudentCode,
             FullName       = user?.FullName ?? $"{student.FirstName} {student.LastName}".Trim(),
             Email          = user?.Email    ?? student.Email,

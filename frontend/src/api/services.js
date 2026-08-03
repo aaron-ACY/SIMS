@@ -15,6 +15,7 @@ export const userService = {
   createStudent: (data) => api.post('/users/student', data),
   createInstructor: (data) => api.post('/users/instructor', data),
   deleteUser: (id) => api.delete(`/users/${id}`),
+  changePassword: (data) => api.put('/users/change-password', data),
 };
 
 export const studentService = {

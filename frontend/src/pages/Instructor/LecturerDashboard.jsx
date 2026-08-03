@@ -1,40 +1,97 @@
 import React, { useState, useEffect } from 'react';
-import { School, Users, GraduationCap, CheckCircle } from 'lucide-react';
+import { School, Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+
+import { userService, classService, gradeService } from '../../api/services';
 
 import OverviewCard from '../../components/dashboard/OverviewCard';
 import ScheduleCard from '../../components/dashboard/ScheduleCard';
 import ActivityCard from '../../components/dashboard/ActivityCard';
 import AnnouncementCard from '../../components/dashboard/AnnouncementCard';
-import DeadlineCard from '../../components/dashboard/DeadlineCard';
 
 const LecturerDashboard = () => {
   // API States
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Dashboard Data
   const [stats, setStats] = useState({
-    classesCount: null,
-    studentsCount: null,
-    assignmentsCount: null,
-    pendingGrading: null
+    classesCount: 0,
+    studentsCount: 0,
   });
   
   const [scheduleData, setScheduleData] = useState([]);
   const [activities, setActivities] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
-  const [deadlines, setDeadlines] = useState([]);
 
-  // Future API Integration
   useEffect(() => {
-    // setIsLoading(true);
-    // fetchDashboardData().then(data => {
-    //   setStats(data.stats);
-    //   setScheduleData(data.schedule);
-    //   setActivities(data.activities);
-    //   setAnnouncements(data.announcements);
-    //   setDeadlines(data.deadlines);
-    // }).finally(() => setIsLoading(false));
+    const fetchDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch current user (instructor)
+        const userRes = await userService.getMe();
+        if (!userRes.success || !userRes.result) return;
+        const user = userRes.result;
+
+        // Fetch all classes and filter by this instructor's code
+        const classesRes = await classService.getClasses();
+        let myClasses = [];
+        if (classesRes.success && classesRes.result) {
+          myClasses = classesRes.result.filter(c => c.instructorCode === user.instructorCode);
+        }
+
+        const totalStudents = myClasses.reduce((acc, curr) => acc + (curr.currentEnrollment || 0), 0);
+
+        setStats({
+          classesCount: myClasses.length,
+          studentsCount: totalStudents,
+        });
+
+        // Generate Mock Schedule from real classes
+        const mockSchedule = myClasses.map((c, index) => {
+          const hours = 8 + (index * 2);
+          const time = `${hours.toString().padStart(2, '0')}:00 - ${(hours + 2).toString().padStart(2, '0')}:00`;
+          return {
+            time: time,
+            course: c.subjectName || c.classCode,
+            room: `Room ${101 + index}`
+          };
+        });
+        setScheduleData(mockSchedule);
+
+        // Fetch grades for activities
+        let allActivities = [];
+        for (const cls of myClasses) {
+          try {
+            const gradesRes = await gradeService.getClassGrades(cls.id);
+            if (gradesRes.success && gradesRes.result) {
+              const submissions = gradesRes.result.filter(g => g.submissionPath);
+              submissions.forEach(sub => {
+                allActivities.push({
+                  studentName: sub.studentName,
+                  classCode: sub.classCode || cls.classCode,
+                  updatedAt: new Date(sub.updatedAt),
+                  isGraded: sub.score !== null
+                });
+              });
+            }
+          } catch (e) {
+            console.error(`Failed to fetch grades for class ${cls.id}`, e);
+          }
+        }
+
+        // Sort activities by most recent and take top 5
+        allActivities.sort((a, b) => b.updatedAt - a.updatedAt);
+        setActivities(allActivities.slice(0, 5));
+
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
   }, []);
 
   return (
@@ -52,7 +109,7 @@ const LecturerDashboard = () => {
       </div>
 
       {/* Stats Widgets */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <OverviewCard 
           title="Total Classes" 
           value={stats.classesCount} 
@@ -69,33 +126,15 @@ const LecturerDashboard = () => {
           colorClass="text-emerald-500" 
           bgClass="bg-emerald-500/10" 
         />
-        <OverviewCard 
-          title="Assignments" 
-          value={stats.assignmentsCount} 
-          icon={GraduationCap} 
-          isLoading={isLoading} 
-          colorClass="text-amber-500" 
-          bgClass="bg-amber-500/10" 
-        />
-        <OverviewCard 
-          title="To Grade" 
-          value={stats.pendingGrading} 
-          icon={CheckCircle} 
-          isLoading={isLoading} 
-          colorClass="text-purple-500" 
-          bgClass="bg-purple-500/10" 
-        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 flex flex-col gap-6">
           <ActivityCard activities={activities} isLoading={isLoading} />
-          <AnnouncementCard announcements={announcements} isLoading={isLoading} />
         </div>
         
         <div className="flex flex-col gap-6">
           <ScheduleCard scheduleData={scheduleData} isLoading={isLoading} />
-          <DeadlineCard deadlines={deadlines} isLoading={isLoading} />
         </div>
       </div>
     </motion.div>

@@ -54,12 +54,15 @@ public class ClassService : IClassService
             var instructorName = instructor is not null && instructor.UserId.HasValue && userMap.TryGetValue(instructor.UserId.Value, out var n)
                 ? n : string.Empty;
 
+            var instructorCode = instructor?.InstructorCode ?? string.Empty;
+
             return new ClassListItemResponse
             {
                 Id                = c.Id,
                 ClassCode         = c.ClassCode,
                 SubjectName       = subjectName ?? string.Empty,
                 InstructorId      = c.InstructorId,
+                InstructorCode    = instructorCode,
                 InstructorName    = instructorName,
                 MaxEnrollment     = c.MaxEnrollment,
                 CurrentEnrollment = c.CurrentEnrollment,

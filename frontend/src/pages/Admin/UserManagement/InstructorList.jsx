@@ -71,6 +71,25 @@ const InstructorList = () => {
     }
   };
 
+  const handleDeleteInstructor = async (userId) => {
+    if (!userId) {
+      alert("This instructor doesn't have a registered user account to delete.");
+      return;
+    }
+    
+    try {
+      const res = await userService.deleteUser(userId);
+      if (res.success) {
+        fetchInstructors();
+      } else {
+        alert(res.message || 'Failed to delete user');
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || 'Error deleting user');
+    }
+  };
+
   return (
     <div className="p-6 text-[var(--theme-text)] space-y-6">
       <PageHeader 
@@ -155,6 +174,7 @@ const InstructorList = () => {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <button 
+                        onClick={() => handleDeleteInstructor(instructor.userId)}
                         className="p-2 hover:bg-red-500/10 rounded-lg transition-colors text-red-500/70 hover:text-red-600 cursor-pointer"
                         title="Delete Instructor"
                       >

@@ -311,6 +311,7 @@ public class InstructorService : IInstructorService
         return new InstructorResponse
         {
             Id             = instructor.Id,
+            UserId         = instructor.UserId,
             InstructorCode = instructor.InstructorCode,
             FullName       = user?.FullName ?? $"{instructor.FirstName} {instructor.LastName}".Trim(),
             Email          = user?.Email    ?? instructor.Email,
