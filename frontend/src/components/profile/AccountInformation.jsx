@@ -4,7 +4,7 @@ import { Shield } from 'lucide-react';
 
 const AccountInformation = ({ data }) => {
   return (
-    <ProfileCard title="Account Information" icon={Shield}>
+    <ProfileCard title="Account Information" icon={Shield} isDropdown={false}>
       <div className="space-y-4">
         <InfoRow label="Username" value={data?.username} />
         <InfoRow label="Role" value={data?.role} />

@@ -1,8 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Save } from 'lucide-react';
+import { userService } from '../../api/services';
 
-const EditProfileModal = ({ isOpen, onClose, data }) => {
+const EditProfileModal = ({ isOpen, onClose, data, onProfileUpdated }) => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        firstName: data.firstName || '',
+        lastName: data.lastName || '',
+        email: data.email || ''
+      });
+    }
+  }, [data, isOpen]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      setIsSubmitting(true);
+      const res = await userService.updateMe(formData);
+      if (res.success || res.result) {
+        if (onProfileUpdated) onProfileUpdated();
+        onClose();
+      } else {
+        alert(res.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error updating profile');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -29,16 +70,16 @@ const EditProfileModal = ({ isOpen, onClose, data }) => {
             <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">Full Name</label>
-                  <input type="text" defaultValue={data?.fullName} className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-semibold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors" />
+                  <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">First Name</label>
+                  <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-semibold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">Phone Number</label>
-                  <input type="tel" defaultValue={data?.phone} className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-semibold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors" />
+                  <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">Last Name</label>
+                  <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-semibold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors" />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">Address</label>
-                  <input type="text" defaultValue={data?.address} className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-semibold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors" />
+                  <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">Email Address</label>
+                  <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-semibold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors" />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-[var(--theme-textMuted)] uppercase tracking-wider mb-2">Avatar Upload</label>
@@ -58,11 +99,12 @@ const EditProfileModal = ({ isOpen, onClose, data }) => {
                 Cancel
               </button>
               <button 
-                onClick={onClose}
-                className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-[var(--theme-primary)] hover:bg-[var(--theme-primaryDark)] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                onClick={handleSave}
+                disabled={isSubmitting}
+                className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-[var(--theme-primary)] hover:bg-[var(--theme-primaryDark)] rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <Save size={16} />
-                Save Changes
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </motion.div>

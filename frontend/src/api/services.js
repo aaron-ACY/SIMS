@@ -26,9 +26,7 @@ export const studentService = {
   importStudents: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/students/import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return api.post('/students/import', formData);
   },
 };
 
@@ -41,9 +39,7 @@ export const instructorService = {
   importInstructors: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/instructors/import', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return api.post('/instructors/import', formData);
   },
 };
 
@@ -71,9 +67,7 @@ export const gradeService = {
   submitAssignment: (enrollmentId, file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post(`/grades/${enrollmentId}/submit`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return api.post(`/grades/${enrollmentId}/submit`, formData);
   },
   enterGrade: (data) => api.post('/grades', data),
   updateGrade: (id, data) => api.put(`/grades/${id}`, data),

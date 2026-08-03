@@ -11,18 +11,20 @@ import PageHeader from '../../../components/Shared/PageHeader';
 import SectionCard from '../../../components/Shared/SectionCard';
 import EmptyState from '../../../components/Shared/EmptyState';
 import Modal from '../../../components/Shared/Modal';
-import { classService } from '../../../api/services';
+import { classService, instructorService, subjectService } from '../../../api/services';
 import { useNavigate } from 'react-router-dom';
 
 const ClassList = () => {
   const navigate = useNavigate();
   const [classes, setClasses] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    classCode: '', subjectId: 1, instructorId: 1, semester: 1, 
+    classCode: '', subjectId: '', instructorId: '', semester: 1, 
     academicYear: '', room: '', schedule: '', maxEnrollment: 40
   });
   
@@ -40,8 +42,22 @@ const ClassList = () => {
     }
   };
 
+  const fetchDropdownData = async () => {
+    try {
+      const [instRes, subRes] = await Promise.all([
+        instructorService.getInstructors(),
+        subjectService.getSubjects()
+      ]);
+      if (instRes.success) setInstructors(instRes.result || []);
+      if (subRes.success) setSubjects(subRes.result || []);
+    } catch (error) {
+      console.error('Failed to fetch dropdown data:', error);
+    }
+  };
+
   useEffect(() => {
     fetchClasses();
+    fetchDropdownData();
   }, []);
 
   const handleInputChange = (e) => {
@@ -66,7 +82,7 @@ const ClassList = () => {
       if (res.success || res.result) {
         setIsAddModalOpen(false);
         setFormData({
-          classCode: '', subjectId: 1, instructorId: 1, semester: 1, 
+          classCode: '', subjectId: '', instructorId: '', semester: 1, 
           academicYear: '', room: '', schedule: '', maxEnrollment: 40
         });
         fetchClasses();
@@ -198,12 +214,22 @@ const ClassList = () => {
               <input type="text" name="classCode" required value={formData.classCode} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[var(--theme-text)]">Subject ID *</label>
-              <input type="number" name="subjectId" required min={1} value={formData.subjectId} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <label className="text-xs font-semibold text-[var(--theme-text)]">Subject *</label>
+              <select name="subjectId" required value={formData.subjectId} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]">
+                <option value="">Select a Subject...</option>
+                {subjects.map(sub => (
+                  <option key={sub.id} value={sub.id}>{sub.subjectCode} - {sub.name}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[var(--theme-text)]">Instructor ID *</label>
-              <input type="number" name="instructorId" required min={1} value={formData.instructorId} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]" />
+              <label className="text-xs font-semibold text-[var(--theme-text)]">Instructor *</label>
+              <select name="instructorId" required value={formData.instructorId} onChange={handleInputChange} className="w-full px-3 py-2 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-lg text-sm focus:outline-none focus:border-[var(--theme-primary)]">
+                <option value="">Select an Instructor...</option>
+                {instructors.map(inst => (
+                  <option key={inst.id} value={inst.id}>{inst.instructorCode} - {inst.fullName}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[var(--theme-text)]">Semester *</label>
