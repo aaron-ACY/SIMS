@@ -23,6 +23,12 @@ public class EnrollmentRepository : CsvRepositoryBase<Enrollment>, IEnrollmentRe
         return enrollments.Where(e => e.ClassId == classId && e.IsActive);
     }
 
+    public async Task<IEnumerable<Enrollment>> GetByStudentIdAsync(int studentId)
+    {
+        var enrollments = await ReadAllAsync();
+        return enrollments.Where(e => e.StudentId == studentId && e.IsActive);
+    }
+
     public async Task<Enrollment?> GetAsync(int classId, int studentId)
     {
         var enrollments = await ReadAllAsync();
