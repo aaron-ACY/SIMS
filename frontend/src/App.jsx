@@ -30,6 +30,7 @@ import ClassList from "./pages/Admin/UserManagement/ClassList";
 import ViewClass from "./pages/Admin/UserManagement/ViewClass";
 import CourseList from "./pages/Admin/CourseManager/CourseList";
 import Reports from "./pages/Admin/Reports/Reports";
+import { Toaster } from 'react-hot-toast';
 
 import { ThemeProvider } from "./context/ThemeContext";
 
@@ -38,6 +39,7 @@ function App() {
     <ThemeProvider>
       <Router>
         <AuthProvider>
+          <Toaster position="top-right" />
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />

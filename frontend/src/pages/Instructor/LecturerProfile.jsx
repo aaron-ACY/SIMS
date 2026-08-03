@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Camera, Plus, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { userService } from '../../api/services';
+import { userService, instructorService } from '../../api/services';
 
 import AvatarUploader from '../../components/profile/AvatarUploader';
 import ProfileInformation from '../../components/profile/ProfileInformation';
@@ -27,6 +27,29 @@ const LecturerProfile = () => {
       const res = await userService.getMe();
       if (res.success && res.result) {
         const user = res.result;
+        
+        let department = 'Contact Admin';
+        let degree = 'Contact Admin';
+        let phone = '';
+
+        if (user.instructorCode) {
+          try {
+            const instRes = await instructorService.getInstructors();
+            if (instRes.success && instRes.result) {
+              const myInstData = instRes.result.find(
+                i => i.instructorCode?.trim() === user.instructorCode?.trim()
+              );
+              if (myInstData) {
+                department = myInstData.department?.trim() || 'Contact Admin';
+                degree = myInstData.degree?.trim() || 'Contact Admin';
+                phone = myInstData.phone?.trim() || '';
+              }
+            }
+          } catch (e) {
+            console.error('Failed to fetch instructor details', e);
+          }
+        }
+
         setProfileData({
           avatarUrl: null,
           personalInfo: {
@@ -34,6 +57,8 @@ const LecturerProfile = () => {
             lastName: user.lastName,
             fullName: (user.firstName + ' ' + user.lastName).trim(),
             email: user.email,
+            phone: phone,
+            code: user.instructorCode || 'N/A',
           },
           accountInfo: {
             username: user.username,
@@ -42,8 +67,8 @@ const LecturerProfile = () => {
           },
           academicInfo: {
             instructorCode: user.instructorCode || 'N/A',
-            department: 'Contact Admin',
-            degree: 'Contact Admin',
+            department: department,
+            degree: degree,
             permissions: user.permissions || []
           }
         });

@@ -18,8 +18,7 @@ const AccountInformation = ({ data }) => {
             </span>
           } 
         />
-        <InfoRow label="Last Login" value={data?.lastLogin} />
-        <InfoRow label="Created Date" value={data?.createdDate} />
+
       </div>
     </ProfileCard>
   );

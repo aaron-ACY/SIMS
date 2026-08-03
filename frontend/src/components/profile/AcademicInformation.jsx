@@ -7,9 +7,9 @@ const AcademicInformation = ({ data }) => {
     <ProfileCard title="Academic Information" icon={GraduationCap}>
       <div className="space-y-4">
         <InfoRow label="Degree" value={data?.degree} />
-        <InfoRow label="Specialization" value={data?.specialization} />
+
         <InfoRow label="Department/Major" value={data?.department} />
-        <InfoRow label="Hire Date" value={data?.hireDate} />
+
       </div>
     </ProfileCard>
   );

@@ -7,12 +7,10 @@ const ProfileInformation = ({ data }) => {
     <ProfileCard title="Personal Information" icon={User}>
       <div className="space-y-4">
         <InfoRow label="Full Name" value={data?.fullName} />
-        <InfoRow label="Instructor Code" value={data?.code} />
+        <InfoRow label="Instructor ID" value={data?.code} />
         <InfoRow label="Email" value={data?.email} />
         <InfoRow label="Phone Number" value={data?.phone} />
-        <InfoRow label="Gender" value={data?.gender} />
-        <InfoRow label="Date of Birth" value={data?.dob} />
-        <InfoRow label="Address" value={data?.address} />
+
       </div>
     </ProfileCard>
   );

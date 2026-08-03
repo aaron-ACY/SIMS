@@ -1,10 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
-import ScoreInput from './ScoreInput';
-import FeedbackInput from './FeedbackInput';
 
-const GradeModal = ({ isOpen, onClose, studentName }) => {
+const GradeModal = ({ isOpen, onClose, studentName, onSubmitGrade, initialScore }) => {
+  const [score, setScore] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      setScore(initialScore !== undefined && initialScore !== null ? initialScore.toString() : '');
+    }
+  }, [isOpen, initialScore]);
+
+  const handleSave = () => {
+    const numScore = parseFloat(score);
+    if (isNaN(numScore) || numScore < 0 || numScore > 100) {
+      alert("Please enter a valid score between 0 and 100.");
+      return;
+    }
+    onSubmitGrade(numScore);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -29,8 +44,20 @@ const GradeModal = ({ isOpen, onClose, studentName }) => {
             </div>
             
             <div className="p-6 space-y-5">
-              <ScoreInput />
-              <FeedbackInput />
+              <div>
+                <label className="block text-sm font-bold text-[var(--theme-text)] mb-2">
+                  Score (0 - 100)
+                </label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="100" 
+                  value={score}
+                  onChange={(e) => setScore(e.target.value)}
+                  placeholder="Enter score"
+                  className="w-full px-4 py-2.5 bg-[var(--theme-bg)] border border-[var(--theme-border)] rounded-xl text-sm font-bold text-[var(--theme-text)] focus:outline-none focus:border-[var(--theme-primary)] transition-colors appearance-none"
+                />
+              </div>
               
               <div className="bg-[var(--theme-hover)]/30 p-3 rounded-lg text-xs font-medium text-[var(--theme-textMuted)]">
                 * Note: Grades cannot be altered once finalized for the semester.
@@ -45,10 +72,7 @@ const GradeModal = ({ isOpen, onClose, studentName }) => {
                 Cancel
               </button>
               <button 
-                onClick={() => {
-                  // Simulate save
-                  onClose();
-                }}
+                onClick={handleSave}
                 className="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-[var(--theme-primary)] hover:bg-[var(--theme-primaryDark)] rounded-xl transition-all shadow-sm hover:shadow cursor-pointer"
               >
                 Save Grade

@@ -72,6 +72,7 @@ export const gradeService = {
   enterGrade: (data) => api.post('/grades', data),
   updateGrade: (id, data) => api.put(`/grades/${id}`, data),
   getStudentGrades: (studentCode) => api.get(`/grades/student/${studentCode}`),
+  getClassGrades: (classId) => api.get(`/grades/class/${classId}`),
 };
 
 export const permissionService = {
