@@ -1,7 +1,8 @@
-Id, CourseCode, Name                          , Description                                     , Credits, IsRequired, IsActive, CreatedAt                   , UpdatedAt
- 1, CS101     , Introduction to Programming   , Basic programming concepts using C#             ,       3, True      , True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
- 2, CS102     , Mathematics for Computing     , Discrete mathematics and logic for IT students  ,       3, True      , True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
- 3, CS201     , Data Structures and Algorithms, Fundamental data structures and algorithm design,       4, True      , True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
- 4, CS202     , Database Systems              , Relational design and SQL fundamentals          ,       4, True      , True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
- 5, CS301     , Software Engineering          , Software development lifecycle and methodologies,       3, True      , True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
- 6, CS302     , Web Development               , Frontend and backend web application development,       3, False     , True    , 2026-01-01T00:00:00.0000000Z, 2026-01-01T00:00:00.0000000Z
+Id,CourseCode,Name,Description,Credits,IsRequired,IsActive,CreatedAt,UpdatedAt
+1,CS101,Introduction to Programming,Basic programming concepts using C#,3,True,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+2,CS102,Mathematics for Computing,Discrete mathematics and logic for IT students,3,True,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+3,CS201,Data Structures and Algorithms,Fundamental data structures and algorithm design,4,True,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+4,CS202,Database Systems,Relational design and SQL fundamentals,4,True,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+5,CS301,Software Engineering,Software development lifecycle and methodologies,3,True,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+6,CS302,Web Development,Frontend and backend web application development,3,False,True,2026-01-01T00:00:00.0000000Z,2026-01-01T00:00:00.0000000Z
+7,CS303,SDLC,Software Development Life Cycle,3,True,True,2026-08-02T16:19:42.6370703Z,2026-08-02T16:19:42.6370706Z
