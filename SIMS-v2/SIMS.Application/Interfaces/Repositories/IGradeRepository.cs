@@ -10,6 +10,9 @@ public interface IGradeRepository
     /// <summary>Returns all grade records that belong to the given student.</summary>
     Task<IEnumerable<Grade>> GetByStudentIdAsync(int studentId);
 
+    /// <summary>Returns all grade records for every enrollment in the given class.</summary>
+    Task<IEnumerable<Grade>> GetByClassIdAsync(int classId);
+
     Task AddAsync(Grade grade);
 
     /// <summary>Persists changes to an existing grade. Returns false when not found.</summary>

@@ -59,6 +59,7 @@ public class ClassService : IClassService
                 Id                = c.Id,
                 ClassCode         = c.ClassCode,
                 SubjectName       = subjectName ?? string.Empty,
+                InstructorId      = c.InstructorId,
                 InstructorName    = instructorName,
                 MaxEnrollment     = c.MaxEnrollment,
                 CurrentEnrollment = c.CurrentEnrollment,
