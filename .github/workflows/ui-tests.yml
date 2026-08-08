@@ -1,0 +1,75 @@
+name: UI Tests (Selenium)
+
+# Tách riêng khỏi PR gate: các test này chạy Chrome thật và assert trên
+# practicetestautomation.com (site bên ngoài), nên có thể đỏ vì lý do
+# không liên quan tới code trong repo.
+on:
+  schedule:
+    # 02:00 UTC hằng ngày (~09:00 giờ VN).
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: SIMS-v2
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  SOLUTION: SIMS-BackEnd.slnx
+
+jobs:
+  selenium:
+    name: Selenium on Chrome
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('SIMS-v2/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # ubuntu-latest đã có Chrome sẵn; Selenium Manager (WebDriver 4.27) tự
+      # resolve chromedriver khớp version nên không cần setup driver thủ công.
+      - name: Show Chrome version
+        working-directory: .
+        run: google-chrome --version
+
+      - name: Build test project
+        run: dotnet build SIMS.Tests/SIMS.Tests.csproj --configuration Release
+
+      - name: Run UI tests
+        env:
+          # UiTestConfig.Load() đọc selenium.settings.json rồi cho env var
+          # dạng Ui__* ghi đè. Runner không có display nên luôn headless.
+          Ui__Headless: 'true'
+        run: |
+          dotnet test SIMS.Tests/SIMS.Tests.csproj \
+            --configuration Release \
+            --no-build \
+            --filter 'Category=UI' \
+            --logger 'trx;LogFileName=ui-test-results.trx' \
+            --logger 'console;verbosity=normal' \
+            --results-directory ./TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-results
+          path: SIMS-v2/TestResults/
+          retention-days: 14
