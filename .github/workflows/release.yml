@@ -1,0 +1,88 @@
+name: Release Artifacts
+
+# Chưa gắn deploy target. Workflow này chỉ đóng gói artifact sẵn sàng deploy:
+# - backend: output của `dotnet publish` (framework-dependent, net8.0)
+# - frontend: static bundle trong dist/
+# Khi chốt được nơi deploy (Azure App Service / container registry / VPS),
+# thêm job deploy phía sau và cho nó `needs: [backend, frontend]`.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  backend:
+    name: Publish backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SIMS-v2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('SIMS-v2/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Publish
+        run: |
+          dotnet publish SIMS-BackEnd/SIMS-API.csproj \
+            --configuration Release \
+            --output ./publish
+
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sims-api-${{ github.ref_name }}
+          path: SIMS-v2/publish/
+          retention-days: 30
+
+  frontend:
+    name: Build frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || 'http://localhost:5000' }}
+        run: npm run build
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sims-frontend-${{ github.ref_name }}
+          path: frontend/dist/
+          retention-days: 30

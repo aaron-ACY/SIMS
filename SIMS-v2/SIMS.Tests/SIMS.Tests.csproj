@@ -17,6 +17,14 @@
     </PackageReference>
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="FluentAssertions" Version="6.12.2" />
+    <!-- Integration tests build the project's real DI container (AddInfrastructure). -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <!-- Selenium UI tests (Selenium/) doc selenium.settings.json + bien moi truong Ui__*. -->
+    <PackageReference Include="Selenium.WebDriver" Version="4.27.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -24,9 +32,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- File nam trong Selenium/ cho gon, nhung Link dua no ra goc output vi
+         UiTestConfig.Load() doc tu AppContext.BaseDirectory. -->
+    <None Update="Selenium\selenium.settings.json">
+      <Link>selenium.settings.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\SIMS.Application\SIMS.Application.csproj" />
     <ProjectReference Include="..\SIMS.Domain\SIMS.Domain.csproj" />
     <ProjectReference Include="..\SIMS.Shared\SIMS.Shared.csproj" />
+    <!-- Integration test can chay that qua StudentRepository (CSV) va DI container
+         cua project, nen phai tham chieu tang Infrastructure. -->
+    <ProjectReference Include="..\SIMS.Infrastructure\SIMS.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

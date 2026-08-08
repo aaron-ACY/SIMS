@@ -6,6 +6,10 @@
 [Ll]og/
 [Ll]ogs/
 
+# Output cua `dotnet test` va `dotnet publish` (CI sinh ra, khong commit)
+TestResults/
+publish/
+
 # NuGet
 *.nupkg
 *.snupkg

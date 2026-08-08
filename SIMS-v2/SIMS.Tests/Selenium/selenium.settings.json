@@ -1,0 +1,13 @@
+{
+  "Ui": {
+    "BaseUrl": "https://practicetestautomation.com",
+    "LoginPath": "/practice-test-login/",
+    "Browser": "chrome",
+    "Headless": true,
+    "TimeoutSeconds": 15,
+    "ValidUsername": "student",
+    "ValidPassword": "Password123",
+    "SlowMoMs": 0,
+    "TypingDelayMs": 0
+  }
+}

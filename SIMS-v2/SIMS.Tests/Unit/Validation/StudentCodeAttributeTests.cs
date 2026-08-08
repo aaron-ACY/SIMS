@@ -3,7 +3,7 @@ using FluentAssertions;
 using SIMS.Application.Validation;
 using Xunit;
 
-namespace SIMS.Tests.Validation;
+namespace SIMS.Tests.Unit.Validation;
 
 public class StudentCodeAttributeTests
 {

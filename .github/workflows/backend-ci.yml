@@ -1,0 +1,84 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [main, Test]
+    paths:
+      - 'SIMS-v2/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main, Test]
+    paths:
+      - 'SIMS-v2/**'
+      - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+
+# Huỷ run cũ khi push liên tiếp vào cùng branch/PR.
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: SIMS-v2
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  SOLUTION: SIMS-BackEnd.slnx
+
+jobs:
+  build-and-test:
+    name: Build & Test (net8.0)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # SIMS-BackEnd.slnx là định dạng solution XML mới -> cần SDK >= 9.0.200
+      # để parse. Runtime 8.0.x vẫn cần vì mọi project target net8.0.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('SIMS-v2/**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore "$SOLUTION"
+
+      - name: Build
+        run: dotnet build "$SOLUTION" --configuration Release --no-restore
+
+      # Loại Selenium UI tests: chúng cần browser thật và phụ thuộc site bên
+      # ngoài (practicetestautomation.com) nên không phù hợp làm PR gate.
+      # Xem workflow ui-tests.yml.
+      - name: Test (Unit + Integration)
+        run: |
+          dotnet test "$SOLUTION" \
+            --configuration Release \
+            --no-build \
+            --filter 'Category!=UI' \
+            --logger 'trx;LogFileName=test-results.trx' \
+            --logger 'console;verbosity=normal' \
+            --results-directory ./TestResults \
+            --collect:'XPlat Code Coverage'
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-results
+          path: SIMS-v2/TestResults/
+          retention-days: 14
