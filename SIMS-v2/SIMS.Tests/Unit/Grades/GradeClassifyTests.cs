@@ -7,7 +7,7 @@ using SIMS.Domain.Entities;
 using SIMS.Shared.Exceptions;
 using Xunit;
 
-namespace SIMS.Tests.Grades;
+namespace SIMS.Tests.Unit.Grades;
 
 public class GradeServiceTests
 {
